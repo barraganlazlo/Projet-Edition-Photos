@@ -2,17 +2,25 @@
 <html lang="fr" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>Tuto Carton Boite</title>
+    <title>Projet TP</title>
     <link rel="stylesheet" href="css/cartonboite.css">
   </head>
-  <body class="-flexRBetween -align-ifill -flexWrap">
-    <div class="-padALL flex1 back-clear">
-      <button type="button" name="button" class="btn -rounded -bold back-clear color-dark">Coucou</button>
-      <input type="text" name="" value="" placeholder="coucou" class="-bordered bord-dark -rounded back-clearL">
+  <body class="-flexCStart -align-ifill">
+    <h5>Transformations et tests.</h5>
+    <div class="-flexRStart">
+      <input type="file" id="ImageIn">
+      <button class="btn" id="btnImageIn">Upload Image</button>
     </div>
-    <div class="-padALL flex1 back-secondary"></div>
-    <div class="-padALL flex1 back-success"></div>
-    <div class="-padALL flex1 back-warning"></div>
-    <div class="-padALL flex1 back-danger"></div>
+    <div class="-flexRAround padding-very-long">
+      <div class="-flexCStart back-clear -bordered bord-dark">
+        <canvas id="canvasIn" width="300" height="300"></canvas>
+      </div>
+      <div class="-flexCStart back-clear -bordered bord-dark">
+        <canvas id="canvasOut" width="300" height="300" class="back-clear"></canvas>
+      </div>
+    </div>
   </body>
+  <script src="js/app.js" charset="utf-8"></script>
+  <script src="js/imageIn.js" charset="utf-8"></script>
+  <script src="js/imageOut.js" charset="utf-8"></script>
 </html>
