@@ -11,47 +11,55 @@ let canvasOut = document.getElementById('canvasOut');
 let ctxOut = canvasOut.getContext('2d');
 
 let ImageInData;
-let ImageOutData;
 
 function DrawOutContext(debug = true){
   //Draw Image
   if(ImageIn){
-    let w = ctxOut.canvas.width;
-    let h = ctxOut.canvas.height;
-    ImageInData = getImageData(ctxOut,ImageIn, w, h);
-
+    ImageInData = getImageData(ctxOut,ImageIn);
     drawDefaultBackground(ctxOut);
-    processTransformation(ctxOut, ImageInData, w, h);
-    // drawImage(ctxOut,ImageOut);
+    let ImageOutData = processTransformation(ctxOut, ImageInData);
+    ctxOut.putImageData(ImageOutData,0,0);
   }else{
     drawDefaultBackground(ctxOut);
   }
   //Draw Points
-  if(debug) drawKeysPoints(ctxOut);
+  if(debug) drawKeysPoints(keyPoints,ctxOut);
 }
 
-function getImageData(ctx,img, w, h){
-    draw_image(ctx,img);
-    return ctx.getImageData(0,0,w,h);
-}
-
-function processTransformation(ctx, imageData, w,h){
-  let monImageData = ctx.createImageData(w, h);
+function clear(imgData){
+  let w = imgData.width;
+  let h = imgData.height;
   for(let y=0; y<h; y++){
     for(let x=0; x<w; x++){
-      let pos = x + y*w;
+      let pos = x*4 + y*w*4;
+      imgData.data[pos + 0]= 0;
+      imgData.data[pos + 1]= 0;
+      imgData.data[pos + 2]= 0;
+      imgData.data[pos + 3]= 255;
+    }
+  }
+}
+
+function processTransformation(ctx, imgData){
+  let w = imgData.width;
+  let h = imgData.height;
+  let newImgData = ctx.createImageData(w, h);
+  for(let y=0; y<h; y++){
+    for(let x=0; x<w; x++){
+      let pos = x*4 + y*w*4;
       if(insidePolygon(Point(x, y), keyPoints)){
-        for(let i = 0; i < 5; i++){
-          monImageData[pos + i] = imageData[pos + i];
+        for(let i = 0; i < 4; i++){
+          newImgData.data[pos + i] = imgData.data[pos + i];
         }
       }else{
-        for(let i = 0; i < 5; i++){
-          monImageData[pos + i] = 255;
+        for(let i = 0; i < 4; i++){
+          newImgData.data[pos + i] = 255;
         }
       }
     }
   }
-  ctx.putImageData(monImageData, 0, 0);
+
+  return newImgData;
 }
 
 function insidePolygon(point, polygon) {

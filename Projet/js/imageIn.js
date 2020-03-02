@@ -20,20 +20,6 @@ let keyPoints = []; //strategics points
 let pointSize = 4;
 let pointSelected = -1; //Point not defined
 
-function drawKeysPoints(ctx){
-  for(let i = 0; i < keyPoints.length; i++){
-    drawPoint(keyPoints[i], ctx);
-  }
-}
-
-function drawPoint(point, context){
-  context.beginPath();
-  context.strokeStyle = "rgb(247, 221, 114)";
-  context.fillStyle = "rgb(247, 221, 114)";
-  context.arc(point.x, point.y, pointSize, 0, Math.PI * 2, true);
-  context.fill();
-  context.stroke();
-}
 
 function getNearKeyPoint(){
   pointSelected = -1;
@@ -52,12 +38,12 @@ function getNearKeyPoint(){
 function DrawInContext(debug = true){
   //Draw Image
   if(ImageIn){
-    draw_image(ctxIn,ImageIn);
+    drawImage(ctxIn,ImageIn);
   }else{
     drawDefaultBackground(ctxIn);
   }
   //Draw Points
-  if(debug) drawKeysPoints(ctxIn);
+  if(debug) drawKeysPoints(keyPoints,ctxIn);
   DrawOutContext();
 }
 
@@ -81,23 +67,12 @@ let btnImageIn = document.getElementById("btnImageIn");
 let ImageIn;
 btnImageIn.onclick= function(){
   console.log("upload image ");
-  ImageIn = load_image(URL.createObjectURL(inputImageIn.files[0]));
+  console.log(inputImageIn.files[0]);
+  ImageIn = loadImage(URL.createObjectURL(inputImageIn.files[0]));
 }
 
 
-function load_image(src) {
-  let img= new Image();
-  img.onload= DrawInContext;
-  img.onerror=()=>{ console.error("error loading image : " + src)};
-  img.src=src;
-  keyPoints=[];
-  return img;
-}
-function draw_image(ctx,img){
-    ctx.canvas.width = img.width;
-    ctx.canvas.height = img.height;
-    ctx.drawImage(ImageIn, 0,0);
-}
+
 
 /**
  * Event canvasIn
