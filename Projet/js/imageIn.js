@@ -17,18 +17,35 @@ realContextSize(ctxIn);
  * Represent the strategics points to scale localy the image
  */
 let keyPoints = []; //strategics points
+let center = Point(0,0);
 let pointSize = 4;
 let pointSelected = -1; //Point not defined
+let nearPoint = -1; //Point not defined
 
 
 function getNearKeyPoint(){
-  pointSelected = -1;
   for(let i = 0; i < keyPoints.length; i++){
     if(distance(MOUSE, keyPoints[i]) <= pointSize + 3){
-      pointSelected = i;
+      return i;
       break;
     }
   }
+  return -1;
+}
+
+function addKeyPoint(point){
+  keyPoints.push(point);
+  computeCenter();
+}
+
+function computeCenter(){
+  center = Point(0,0);
+  for(let i = 0; i < keyPoints.length; i++){
+    center.x += keyPoints[i].x;
+    center.y += keyPoints[i].y;
+  }
+  center.x /= keyPoints.length;
+  center.y /= keyPoints.length;
 }
 
 /**
@@ -43,7 +60,10 @@ function DrawInContext(debug = true){
     drawDefaultBackground(ctxIn);
   }
   //Draw Points
-  if(debug) drawKeysPoints(keyPoints,ctxIn);
+  if(debug){
+    drawKeysPoints(keyPoints,ctxIn, nearPoint);
+    drawCross(center, ctxIn);
+  }
   DrawOutContext();
 }
 
@@ -59,17 +79,23 @@ function drawDefaultBackground(ctx){
   ctx.fillStyle = "#fff";
   ctx.fillRect(0,0,w,h);
 }
+
 /**
 * loading imagecanvas
 */
 let inputImageIn = document.getElementById("ImageIn");
 let btnImageIn = document.getElementById("btnImageIn");
+
 let ImageIn;
-btnImageIn.onclick= function(){
+btnImageIn.addEventListener("click", () => {
+  inputImageIn.click();
+});
+
+inputImageIn.addEventListener("change", () => {
   console.log("upload image ");
   console.log(inputImageIn.files[0]);
   ImageIn = loadImage(URL.createObjectURL(inputImageIn.files[0]));
-}
+})
 
 
 
@@ -81,9 +107,12 @@ btnImageIn.onclick= function(){
 canvasIn.addEventListener('mousemove', function(e) {
   setMousePos(canvasIn, e);
 
+  nearPoint = getNearKeyPoint();
+
   if(pointSelected >= 0){
     keyPoints[pointSelected].x = MOUSE.x;
     keyPoints[pointSelected].y = MOUSE.y;
+    computeCenter();
   }
   DrawInContext(true);
 }, false);
@@ -92,10 +121,10 @@ canvasIn.addEventListener('mousedown', function(e) {
   setMousePos(canvasIn, e);
 
   // Init the point selected to null
-  getNearKeyPoint();
+  pointSelected = getNearKeyPoint();
 
   if(pointSelected < 0){
-    keyPoints.push(Point(MOUSE.x, MOUSE.y)); //Create point at mouse position
+    addKeyPoint(Point(MOUSE.x, MOUSE.y)); //Create point at mouse position
     pointSelected = keyPoints.length - 1;
   }
   DrawInContext(true);
