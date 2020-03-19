@@ -24,7 +24,7 @@ let USER_DATAS = {
   ImageIn: null,
   global: false,
   scale: 1,
-  rotation: 1,
+  rotation: 0,
   translate: new Vector2(0, 0),
   /**
    * Types possible :

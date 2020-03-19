@@ -30,6 +30,11 @@ function distance(a, b) {
 }
 
 
+function roundPoint(point){
+  point.x=Math.round(point.x);
+  point.y=Math.round(point.y);
+  return point;
+}
 
 /**
  * Calculate extremum points
@@ -48,6 +53,7 @@ class MinMaxVector2 {
         if (vec2.y > this.maxPos.y) this.maxPos.y = vec2.y;
     }
 }
+
 /**
 * Convert degrees to radians
 */

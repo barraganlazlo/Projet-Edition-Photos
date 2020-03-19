@@ -23,9 +23,11 @@ function DrawOutContext(debug = true) {
 
   let scaleMatrix = matrixScale(USER_DATAS.scale);
   let rotateMatrix = matrixRotation(degrees_to_radians(USER_DATAS.rotation));
+  console.log(USER_DATAS.rotation);
   let finalMatrix;
   let invertMatrix;
   let w,h;
+  outKeyPoints = [];
   //Draw Image
   if (USER_DATAS.ImageIn) {
     ImageInData = getImageData(ctxOut, USER_DATAS.ImageIn);
@@ -37,8 +39,8 @@ function DrawOutContext(debug = true) {
       let height_imageIn = USER_DATAS.ImageIn.height;
       let width_imageIn = USER_DATAS.ImageIn.width;
 
-      let translatetocenterMatrix = matrixTranslate(new Vector2(-width_imageIn / 2, -height_imageIn / 2));
-      let translatebackMatrix = matrixTranslate(new Vector2(width_imageIn / 2, height_imageIn / 2));
+      let translatetocenterMatrix = matrixTranslate(new Vector2(-Math.round(width_imageIn / 2), -Math.round(height_imageIn / 2)));
+      let translatebackMatrix = matrixTranslate(new Vector2(Math.round(width_imageIn / 2), Math.round(height_imageIn / 2)));
       finalMatrix = Matrix.mult(translatebackMatrix, rotateMatrix, scaleMatrix, translatetocenterMatrix);
       invertMatrix = Matrix.invert(finalMatrix);
 
@@ -47,6 +49,10 @@ function DrawOutContext(debug = true) {
       let x1 = linearTransformationPoint(new Point(USER_DATAS.ImageIn.width, 0), finalMatrix);
       let x2 = linearTransformationPoint(new Point(USER_DATAS.ImageIn.width, USER_DATAS.ImageIn.height), finalMatrix);
       let x3 = linearTransformationPoint(new Point(0, USER_DATAS.ImageIn.height), finalMatrix);
+      x0 = roundPoint(x0);
+      x1 = roundPoint(x1);
+      x2 = roundPoint(x2);
+      x3 = roundPoint(x3);
       let minMax = new MinMaxVector2();
       minMax.addValue(x0);
       minMax.addValue(x1);
@@ -55,6 +61,7 @@ function DrawOutContext(debug = true) {
 
       h = minMax.maxPos.y - minMax.minPos.y;
       w = minMax.maxPos.x - minMax.minPos.x;
+      console.log(w, h);
 
       //Set extremum points polygone
       outKeyPoints = [new Vector2(0,0),new Vector2(w,0),new Vector2(w,h),new Vector2(0,h)];
