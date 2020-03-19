@@ -1,43 +1,51 @@
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <title>Projet TP</title>
     <link rel="stylesheet" href="css/cartonboite.css">
-  </head>
-  <body class="-flexCStart -align-ifill">
+</head>
+
+<body class="-flexCStart -align-ifill">
     <div class="-flexCStart padding-very-long back-1 color-clear">
-      <h5 class = "-align-scenter -bold">Transformations et tests.</h5>
+        <h5 class="-align-scenter -bold">Transformations et tests.</h5>
 
     </div>
     <div class="-flexRAround flex1 -align-ifill back-1 back--vlight">
-      <section class="flex1 padding-very-long -flexCStart">
-        <div class="-flexCStart back-clear -bordered bord-1 -bordsize-long -long margin-very-long">
-          <canvas id="canvasIn" width="300" height="300"></canvas>
-        </div>
-        <div class="-flexRStart">
-          <input type="file" id="ImageIn" class="back-1 color-clear -margALL" style="display:none;">
-          <button class="btn -roundest back-1" id="btnImageIn">Upload Image</button>
-        </div>
-      </section>
-      <section class="flex1 padding-very-long -flexCStart">
-        <div class="-flexCStart back-clear -bordered bord-1 -bordsize-long -long margin-very-long">
-          <canvas id="canvasOut" width="300" height="300" class="back-clear"></canvas>
-        </div>
+        <section class="flex1 padding-very-long -flexCStart">
+            <div class="-flexCStart back-clear -bordered bord-1 -bordsize-long -long margin-very-long">
+                <canvas id="canvasIn" width="300" height="300"></canvas>
+            </div>
+            <div class="-flexRStart">
+                <input type="file" id="ImageIn" class="back-1 color-clear -margALL" style="display:none;">
+                <button class="btn -roundest back-1" id="btnImageIn">Upload Image</button>
+            </div>
+        </section>
+        <section class="flex1 padding-very-long -flexCStart">
+            <div class="-flexCStart back-clear -bordered bord-1 -bordsize-long -long margin-very-long">
+                <canvas id="canvasOut" width="300" height="300" class="back-clear"></canvas>
+            </div>
 
-        <div class="-flexCStart">
-          <label class="-flexRStart">
-            <p class="-margR -bold">Valeur du scale</p>
-            <input type="number" name="scale" value="1" class="back-clear -roundest font-small padding-small">
-          </label>
-        </div>
-      </section>
+            <div class="-flexCStart">
+                <label>
+                <input type="checkbox">
+                <span class="checkbox">
+                <p class="-margL">Filtre global</p>
+            </label>
+                <label class="-flexRStart">
+                <p class="-margR -bold">Valeur du scale</p>
+                <input type="number" name="scale" value="1" class="back-clear -roundest font-small padding-small">
+            </label>
+            </div>
+        </section>
     </div>
-  </body>
-  <script src="js/maths.js" charset="utf-8"></script>
-  <script src="js/draw.js" charset="utf-8"></script>
-  <script src="js/image.js" charset="utf-8"></script>
-  <script src="js/app.js" charset="utf-8"></script>
-  <script src="js/imageIn.js" charset="utf-8"></script>
-  <script src="js/imageOut.js" charset="utf-8"></script>
+</body>
+<script src="js/maths.js" charset="utf-8"></script>
+<script src="js/draw.js" charset="utf-8"></script>
+<script src="js/image.js" charset="utf-8"></script>
+<script src="js/app.js" charset="utf-8"></script>
+<script src="js/imageIn.js" charset="utf-8"></script>
+<script src="js/imageOut.js" charset="utf-8"></script>
+
 </html>
