@@ -29,6 +29,28 @@ function distance(a, b) {
     return Math.sqrt(((a.x - b.x) * (a.x - b.x)) + ((a.y - b.y) * (a.y - b.y)));
 }
 
+
+
+/**
+ * Calculate extremum points
+ */
+class MinMaxVector2 {
+    constructor() {
+        this.minPos = new Vector2(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER);
+        this.maxPos = new Vector2(0, 0);
+    }
+
+    addValue(vec2) {
+        if (vec2.x < this.minPos.x) this.minPos.x = vec2.x;
+        if (vec2.y < this.minPos.y) this.minPos.y = vec2.y;
+
+        if (vec2.x > this.maxPos.x) this.maxPos.x = vec2.x;
+        if (vec2.y > this.maxPos.y) this.maxPos.y = vec2.y;
+    }
+}
+/**
+* Convert degrees to radians
+*/
 function degrees_to_radians(degrees)
 {
   var pi = Math.PI;

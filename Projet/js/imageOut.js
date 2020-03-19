@@ -12,55 +12,89 @@ let ctxOut = canvasOut.getContext('2d');
 
 let ImageInData;
 
-let copyKeyPoints = [];
+let outKeyPoints = [];
 
 
 /**
 * Draw canvas' out context
-* @param {Boolean} debug
+* @param {Boolean} debug draw polygon points
 */
 function DrawOutContext(debug = true) {
 
-  copyKeyPoints = [];
-  let translateMatrix = matrixTranslate(new Vector2(-center.x, -center.y));
-  let translateMatrix2 = matrixTranslate(center);
   let scaleMatrix = matrixScale(USER_DATAS.scale);
   let rotateMatrix = matrixRotation(degrees_to_radians(USER_DATAS.rotation));
-  let finalMatrix = Matrix.mult(translateMatrix2, rotateMatrix, scaleMatrix, translateMatrix);
-  let invertMatrix = Matrix.invert(finalMatrix);
-
-  //Application de la transformation
-  let newCenter = linearTransformationPoint(center, finalMatrix);
-  for (let i = 0; i < keyPoints.length; i++) {
-    copyKeyPoints[i] = linearTransformationPoint(keyPoints[i], finalMatrix);
-  }
-
+  let finalMatrix;
+  let invertMatrix;
+  let w,h;
   //Draw Image
   if (USER_DATAS.ImageIn) {
     ImageInData = getImageData(ctxOut, USER_DATAS.ImageIn);
     drawDefaultBackground(ctxOut);
+    let ImageOutData;
+    let newCenter;
+    if(USER_DATAS.global){
 
-    let ImageOutDataScale;
+      let height_imageIn = USER_DATAS.ImageIn.height;
+      let width_imageIn = USER_DATAS.ImageIn.width;
+
+      let translatetocenterMatrix = matrixTranslate(new Vector2(-width_imageIn / 2, -height_imageIn / 2));
+      let translatebackMatrix = matrixTranslate(new Vector2(width_imageIn / 2, height_imageIn / 2));
+      finalMatrix = Matrix.mult(translatebackMatrix, rotateMatrix, scaleMatrix, translatetocenterMatrix);
+      invertMatrix = Matrix.invert(finalMatrix);
+
+      //calculate height and width of the image after transformation
+      let x0 = linearTransformationPoint(new Point(0,0), finalMatrix);
+      let x1 = linearTransformationPoint(new Point(USER_DATAS.ImageIn.width, 0), finalMatrix);
+      let x2 = linearTransformationPoint(new Point(USER_DATAS.ImageIn.width, USER_DATAS.ImageIn.height), finalMatrix);
+      let x3 = linearTransformationPoint(new Point(0, USER_DATAS.ImageIn.height), finalMatrix);
+      let minMax = new MinMaxVector2();
+      minMax.addValue(x0);
+      minMax.addValue(x1);
+      minMax.addValue(x2);
+      minMax.addValue(x3);
+
+      h = minMax.maxPos.y - minMax.minPos.y;
+      w = minMax.maxPos.x - minMax.minPos.x;
+
+      //Set extremum points polygone
+      outKeyPoints = [new Vector2(0,0),new Vector2(w,0),new Vector2(w,h),new Vector2(0,h)];
+
+      setContextSize(ctxOut, w, h);
+    }else{
+      w = ImageInData.width;
+      h = ImageInData.height;
+
+      let translatetocenterMatrix = matrixTranslate(new Vector2(-center.x, -center.y));
+      let translatebackMatrix = matrixTranslate(center);
+      let translateMatrix = matrixTranslate(USER_DATAS.translate);
+      finalMatrix = Matrix.mult(translateMatrix, translatebackMatrix, rotateMatrix, scaleMatrix, translatetocenterMatrix);
+      invertMatrix = Matrix.invert(finalMatrix);
+      //Application de la transformation
+      newCenter = linearTransformationPoint(center, finalMatrix);
+      for (let i = 0; i < keyPoints.length; i++) {
+        outKeyPoints[i] = linearTransformationPoint(keyPoints[i], finalMatrix);
+      }
+    }
+
     switch(USER_DATAS.interporlationType){
       case "NearestNeighbor" :
-        ImageOutDataScale = NearestNeighbor(ctxOut, ImageInData, copyKeyPoints, invertMatrix);
+        ImageOutData = NearestNeighbor(ctxOut, ImageInData, w, h, outKeyPoints, invertMatrix);
         break;
       case "Bilinear" :
-        ImageOutDataScale = Bilinear(ctxOut, ImageInData, copyKeyPoints, invertMatrix);
+        ImageOutData = Bilinear(ctxOut, ImageInData, w, h, outKeyPoints, invertMatrix);
         break;
       case "Bicubic" :
-        ImageOutDataScale = Bicubic(ctxOut, ImageInData, copyKeyPoints, invertMatrix);
+        ImageOutData = Bicubic(ctxOut, ImageInData, w, h, outKeyPoints, invertMatrix);
         break;
     }
-    ctxOut.putImageData(ImageOutDataScale, 0, 0);
+    ctxOut.putImageData(ImageOutData, 0, 0);
+    //Draw Points
+    if (debug  && !USER_DATAS.global) {
+      drawKeysPoints(outKeyPoints, ctxOut);
+      drawCross(newCenter, ctxOut);
+    }
   } else {
     drawDefaultBackground(ctxOut);
-  }
-
-  //Draw Points
-  if (debug) {
-    drawKeysPoints(copyKeyPoints, ctxOut);
-    drawCross(newCenter, ctxOut);
   }
 }
 /**
@@ -92,11 +126,9 @@ function clear(imgData) {
 * @param {Polygon} polygon le polygone transformé
 * @param {Matrix} invertMatrix la matrice inverce de la transformation qu'à reçu le polygone
 *
-* @returns {ImageData} la nouvelle image data
+* @returns {ImageData} newImgData la nouvelle image data
 */
-function NearestNeighbor(ctx, imgData, polygon, invertMatrix) {
-  let w = imgData.width;
-  let h = imgData.height;
+function NearestNeighbor(ctx, imgData, w, h, polygon, invertMatrix) {
   let newImgData = ctx.createImageData(w, h);
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -131,9 +163,7 @@ function NearestNeighbor(ctx, imgData, polygon, invertMatrix) {
 *
 * @returns {ImageData} la nouvelle image data
 */
-function Bilinear(ctx, imgData, polygon, invertMatrix) {
-  let w = imgData.width;
-  let h = imgData.height;
+function Bilinear(ctx, imgData, w, h, polygon, invertMatrix) {
   let newImgData = ctx.createImageData(w, h);
 
   for (let y = 0; y < h; y++) {
@@ -176,9 +206,7 @@ function Bilinear(ctx, imgData, polygon, invertMatrix) {
 * @returns {ImageData} la nouvelle image data
 */
 //TODO
-function Bicubic(ctx, imgData, polygon, invertMatrix) {
-  let w = imgData.width;
-  let h = imgData.height;
+function Bicubic(ctx, imgData, w, h, polygon, invertMatrix) {
   let newImgData = ctx.createImageData(w, h);
 
   for (let y = 0; y < h; y++) {

@@ -1,7 +1,11 @@
 function drawImage(ctx, img) {
-  ctx.canvas.width = img.width;
-  ctx.canvas.height = img.height;
+  setContextSize(ctx, img.width, img.height);
   ctx.drawImage(USER_DATAS.ImageIn, 0, 0);
+}
+
+function setContextSize(ctx, width, height){
+  ctx.canvas.width = width;
+  ctx.canvas.height = height;
 }
 
 function drawKeysPoints(keyPoints, ctx, pointSelected = -1) {
