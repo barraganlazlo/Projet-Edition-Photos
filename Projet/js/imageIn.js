@@ -1,9 +1,9 @@
 /**
- * System to get an image and place strategics point
- *
- * @author Lazlo_Barragan
- * @author Romain_Saclier
- */
+* System to get an image and place strategics point
+*
+* @author Lazlo_Barragan
+* @author Romain_Saclier
+*/
 
 
 //Canvas in
@@ -13,9 +13,9 @@ realContextSize(ctxIn);
 
 
 /**
- * Key Points
- * Represent the strategics points to scale localy the image
- */
+* Key Points
+* Represent the strategics points to scale localy the image
+*/
 let keyPoints = []; //strategics points
 let center = Point(0, 0);
 let pointSize = 4;
@@ -48,8 +48,8 @@ function computeCenter() {
 }
 
 /**
- * Draw Context
- */
+* Draw Context
+*/
 
 function DrawInContext(debug = true) {
   //Draw Image
@@ -81,8 +81,8 @@ function drawDefaultBackground(ctx) {
 
 
 /**
- * Event canvasIn
- */
+* Event canvasIn
+*/
 
 canvasIn.addEventListener('mousemove', function(e) {
   setMousePos(canvasIn, e);

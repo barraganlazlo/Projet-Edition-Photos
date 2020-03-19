@@ -1,9 +1,9 @@
 /**
- * System to get an image and place strategics point
- *
- * @author Lazlo_Barragan
- * @author Romain_Saclier
- */
+* System to get an image and place strategics point
+*
+* @author Lazlo_Barragan
+* @author Romain_Saclier
+*/
 
 
 //Canvas Out
@@ -13,13 +13,13 @@ let ctxOut = canvasOut.getContext('2d');
 let ImageInData;
 
 let copyKeyPoints = [];
-let scaleMatrix = matrixScale(10);
+let scaleMatrix = matrixScale(8);
 let rotateMatrix = matrixRotation(0);
 
 /**
- * Draw canvas' out context
- * @param {Boolean} debug
- */
+* Draw canvas' out context
+* @param {Boolean} debug
+*/
 function DrawOutContext(debug = true) {
 
   copyKeyPoints = [];
@@ -38,7 +38,7 @@ function DrawOutContext(debug = true) {
   if (USER_DATAS.ImageIn) {
     ImageInData = getImageData(ctxOut, USER_DATAS.ImageIn);
     drawDefaultBackground(ctxOut);
-    let ImageOutDataScale = BoxFilter(ctxOut, ImageInData, copyKeyPoints, invertMatrix);
+    let ImageOutDataScale = Bilinear(ctxOut, ImageInData, copyKeyPoints, invertMatrix);
     ctxOut.putImageData(ImageOutDataScale, 0, 0);
   } else {
     drawDefaultBackground(ctxOut);
@@ -51,9 +51,9 @@ function DrawOutContext(debug = true) {
   }
 }
 /**
- * set every pixel of imgData to black with alpha 255 (0,0,0,255)
- * @param {ImageData} imgData
- */
+* set every pixel of imgData to black with alpha 255 (0,0,0,255)
+* @param {ImageData} imgData
+*/
 function clear(imgData) {
   let w = imgData.width;
   let h = imgData.height;
@@ -73,14 +73,14 @@ function clear(imgData) {
 // 3. on appelle polygonImageMatrix
 //      1. ça va prendre tous les pixels qui sont dans le polygone ( transformé par la matrice )
 /**
- *
- * @param {Context} ctx le context dans lequel on crée la nouvelle image
- * @param {ImageData} imgData l'image data de l'image d'origine
- * @param {Polygon} polygon le polygone transformé
- * @param {Matrix} invertMatrix la matrice inverce de la transformation qu'à reçu le polygone
- *
- * @returns {ImageData} la nouvelle image data
- */
+*
+* @param {Context} ctx le context dans lequel on crée la nouvelle image
+* @param {ImageData} imgData l'image data de l'image d'origine
+* @param {Polygon} polygon le polygone transformé
+* @param {Matrix} invertMatrix la matrice inverce de la transformation qu'à reçu le polygone
+*
+* @returns {ImageData} la nouvelle image data
+*/
 function BoxFilter(ctx, imgData, polygon, invertMatrix) {
   let w = imgData.width;
   let h = imgData.height;
@@ -110,27 +110,106 @@ function BoxFilter(ctx, imgData, polygon, invertMatrix) {
 }
 
 /**
- * @param {Point} point
- * @param {Polygon} polygon
- *
- * @returns {Boolean}
- * if point is inside polygon-> true
- * else -> false
- */
+*
+* @param {Context} ctx le context dans lequel on crée la nouvelle image
+* @param {ImageData} imgData l'image data de l'image d'origine
+* @param {Polygon} polygon le polygone transformé
+* @param {Matrix} invertMatrix la matrice inverce de la transformation qu'à reçu le polygone
+*
+* @returns {ImageData} la nouvelle image data
+*/
+function Bilinear(ctx, imgData, polygon, invertMatrix) {
+  let w = imgData.width;
+  let h = imgData.height;
+  let newImgData = ctx.createImageData(w, h);
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      //position du pixel courrant dans newImgData
+      let newPos = x * 4 + y * w * 4;
+
+      if (!insidePolygon(Point(x, y), polygon)) {
+        for (let i = 0; i < 4; i++) {
+          newImgData.data[newPos + i] = 255;
+        }
+        continue;
+      }
+      //position exacte du point après transformation inverse
+      let floatingPos = linearTransformationPoint(Point(x, y), invertMatrix);
+      //position arrondi "au plus proche" après transformation inverse
+      let i = Math.floor(floatingPos.x);
+      let j = Math.floor(floatingPos.y);
+      let t = floatingPos.x - i;
+      let u = floatingPos.y - j;
+      for (let k = 0; k < 4; k++) {
+        let va = (1 - u) * imgData.data[(j*w + i)*4 + k] + u * imgData.data[((j+1)*w + i)*4 + k];
+        let vb = (1 - u) * imgData.data[(j*w + i+1)*4 + k] + u * imgData.data[((j+1)*w + i+1)*4 + k ];
+        newImgData.data[newPos + k] = (1-t) * va + t *vb;
+      }
+    }
+  }
+
+  return newImgData;
+}
+
+// ImgData, x, y, h, w, matriceConvolution
+/**    | v v
+*     | x v
+*     | v v
+*/
+function getValueColor(ImgData, x, y, matriceConvolution) {
+  let w = imgData.width;
+  let h = imgData.height;
+
+  let convolutionSize = matriceConvolution[0].length; // Ex 1 -> 8 voisins
+  let centerMatriceConvolution = (matriceConvolution[0].length / 2).floor();
+
+  let color = {r: 0, g: 0, b: 0, a: 0 };
+  for (let i = 0; i < convolutionSize; i++) { //Parcours Hauteur
+    let posLargeur = position + (i - 1) * (nW * 4);
+    for (let j = 0; j < convolutionSize; j++) { //Parcours Largeur
+      let xVoisin = x + j - centerMatriceConvolution;
+      let yVoisin = y + i - centerMatriceConvolution;
+      let pos = 4 * (yVoisin * w + xVoisin);
+      //Si pos n'est pas en dehors de l'image et que celui-ci est sur la même ligne que l'élément centré
+      if (pos >= 0 && xVoisin >= 0 && xVoisin < w && yVoisin >= 0 && yVoisin < h) {
+        color.r += ImgData[pos] * matriceConvolution[i][j];
+        color.g += ImgData[pos + 1] * matriceConvolution[i][j];
+        color.b += ImgData[pos + 2] * matriceConvolution[i][j];
+        color.a += ImgData[pos + 3] * matriceConvolution[i][j];
+        nbElements += matriceConvolution[i][j];
+      }
+    }
+  }
+  color.r /= nbElements;
+  color.g /= nbElements;
+  color.b /= nbElements;
+  color.a /= nbElements;
+  return color;
+}
+
+/**
+* @param {Point} point
+* @param {Polygon} polygon
+*
+* @returns {Boolean}
+* if point is inside polygon-> true
+* else -> false
+*/
 function insidePolygon(point, polygon) {
 
   let x = point.x,
-    y = point.y;
+  y = point.y;
 
   let inside = false;
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
     let xi = polygon[i].x,
-      yi = polygon[i].y;
+    yi = polygon[i].y;
     let xj = polygon[j].x,
-      yj = polygon[j].y;
+    yj = polygon[j].y;
 
     let intersect = ((yi > y) != (yj > y)) &&
-      (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+    (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
     if (intersect) inside = !inside;
   }
 
