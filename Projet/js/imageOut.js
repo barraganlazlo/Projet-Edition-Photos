@@ -87,14 +87,15 @@ function BoxFilter(ctx, imgData, polygon, invertMatrix) {
   let newImgData = ctx.createImageData(w, h);
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
+      //position du pixel courrant dans newImgData
+      let newPos = x * 4 + y * w * 4;
+
       if (!insidePolygon(Point(x, y), polygon)) {
         for (let i = 0; i < 4; i++) {
           newImgData.data[newPos + i] = 255;
         }
         continue;
       }
-      //position du pixel courrant dans newImgData
-      let newPos = x * 4 + y * w * 4;
       //position exacte du point après transformation inverse
       let floatingPos = linearTransformationPoint(Point(x, y), invertMatrix);
       //position arrondi "au plus proche" après transformation inverse
