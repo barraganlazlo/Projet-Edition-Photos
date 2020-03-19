@@ -43,7 +43,7 @@ function DrawOutContext(debug = true) {
     let ImageOutDataScale;
     switch(USER_DATAS.interporlationType){
       case "NearestNeighbor" :
-        ImageOutDataScale = Box(ctxOut, ImageInData, copyKeyPoints, invertMatrix);
+        ImageOutDataScale = NearestNeighbor(ctxOut, ImageInData, copyKeyPoints, invertMatrix);
         break;
       case "Bilinear" :
         ImageOutDataScale = Bilinear(ctxOut, ImageInData, copyKeyPoints, invertMatrix);
