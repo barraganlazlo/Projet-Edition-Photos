@@ -46,7 +46,6 @@ function computeCenter() {
     center.x /= keyPoints.length;
     center.y /= keyPoints.length;
 }
-matrixTranslate(this.center.x, -center.y),
 
     /**
      * Draw Context
@@ -54,8 +53,8 @@ matrixTranslate(this.center.x, -center.y),
 
     function DrawInContext(debug = true) {
         //Draw Image
-        if (ImageIn) {
-            drawImage(ctxIn, ImageIn);
+        if (USER_DATAS.ImageIn) {
+            drawImage(ctxIn, USER_DATAS.ImageIn);
         } else {
             drawDefaultBackground(ctxIn);
         }
@@ -79,25 +78,6 @@ function drawDefaultBackground(ctx) {
     ctx.fillStyle = "#fff";
     ctx.fillRect(0, 0, w, h);
 }
-
-/**
- * loading imagecanvas
- */
-let inputImageIn = document.getElementById("ImageIn");
-let btnImageIn = document.getElementById("btnImageIn");
-
-let ImageIn;
-btnImageIn.addEventListener("click", () => {
-    inputImageIn.click();
-});
-
-inputImageIn.addEventListener("change", () => {
-    console.log("upload image ");
-    console.log(inputImageIn.files[0]);
-    ImageIn = loadImage(URL.createObjectURL(inputImageIn.files[0]));
-})
-
-
 
 
 /**

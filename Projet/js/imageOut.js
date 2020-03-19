@@ -18,13 +18,13 @@ let rotateMatrix = matrixRotation(0);
 
 /**
  * Draw canvas' out context
- * @param {Boolean} debug 
+ * @param {Boolean} debug
  */
 function DrawOutContext(debug = true) {
 
     copyKeyPoints = [];
-    let translateMatrix = matrixTranslate(-center.x, -center.y);
-    let translateMatrix2 = matrixTranslate(center.x, center.y);
+    let translateMatrix = matrixTranslate(new Vector2(-center.x, -center.y));
+    let translateMatrix2 = matrixTranslate(center);
     let finalMatrix = Matrix.mult(translateMatrix2, rotateMatrix, scaleMatrix, translateMatrix);
     let invertMatrix = Matrix.invert(finalMatrix);
 
@@ -35,12 +35,10 @@ function DrawOutContext(debug = true) {
     }
 
     //Draw Image
-    if (ImageIn) {
-        ImageInData = getImageData(ctxOut, ImageIn);
+    if (USER_DATAS.ImageIn) {
+        ImageInData = getImageData(ctxOut, USER_DATAS.ImageIn);
         drawDefaultBackground(ctxOut);
-        // let ImageOutData = polygonImage(ctxOut, ImageInData, keyPoints);
-        // ctxOut.putImageData(ImageOutData,0,0);
-        let ImageOutDataScale = polygonImageMatrix(ctxOut, ImageInData, copyKeyPoints, invertMatrix);
+        let ImageOutDataScale = BoxFilter(ctxOut, ImageInData, copyKeyPoints, invertMatrix);
         ctxOut.putIm
     } else {
         drawDefaultBackground(ctxOut);
@@ -54,7 +52,7 @@ function DrawOutContext(debug = true) {
 }
 /**
  * set every pixel of imgData to black with alpha 255 (0,0,0,255)
- * @param {ImageData} imgData 
+ * @param {ImageData} imgData
  */
 function clear(imgData) {
     let w = imgData.width;
@@ -70,66 +68,41 @@ function clear(imgData) {
     }
 }
 
-/**
- * Draw an image with a list of points that form a polygone
- * @param {Context} ctx 
- * @param {ImageData} imgData 
- * @param {} polygon 
- */
-function polygonImage(ctx, imgData, polygon) {
-    let w = imgData.width;
-    let h = imgData.height;
-    let newImgData = ctx.createImageData(w, h);
-    for (let y = 0; y < h; y++) {
-        for (let x = 0; x < w; x++) {
-            let pos = x * 4 + y * w * 4;
-            if (insidePolygon(Point(x, y), polygon)) {
-                for (let i = 0; i < 4; i++) {
-                    newImgData.data[pos + i] = imgData.data[pos + i];
-                }
-            } else {
-                for (let i = 0; i < 4; i++) {
-                    newImgData.data[pos + i] = 255;
-                }
-            }
-        }
-    }
-
-    return newImgData;
-}
-
 // 1. on a une image & un polygone ( list de points )
 // 2. on applique une matrice de transformation à tous les points du polygone
 // 3. on appelle polygonImageMatrix
 //      1. ça va prendre tous les pixels qui sont dans le polygone ( transformé par la matrice )
-
 /**
- * 
- * @param {Context} ctx 
- * @param {ImageData} imgData 
- * @param {Polygon} polygon 
- * @param {Matrix} invertMatrix 
- * 
- * @returns
+ *
+ * @param {Context} ctx le context dans lequel on crée la nouvelle image
+ * @param {ImageData} imgData l'image data de l'image d'origine
+ * @param {Polygon} polygon le polygone transformé
+ * @param {Matrix} invertMatrix la matrice inverce de la transformation qu'à reçu le polygone
+ *
+ * @returns {ImageData} la nouvelle image data
  */
-function polygonImageMatrix(ctx, imgData, polygon, invertMatrix) {
+function BoxFilter(ctx, imgData, polygon, invertMatrix) {
     let w = imgData.width;
     let h = imgData.height;
     let newImgData = ctx.createImageData(w, h);
     for (let y = 0; y < h; y++) {
         for (let x = 0; x < w; x++) {
-            let pos = x * 4 + y * w * 4;
-            let vec2 = linearTransformationPoint(Point(x, y), invertMatrix);
-            let realPos = Math.round(vec2.x) * 4 + Math.round(vec2.y) * w * 4;
-            if (insidePolygon(Point(x, y), polygon)) {
-                for (let i = 0; i < 4; i++) {
-                    newImgData.data[pos + i] = imgData.data[realPos + i];
-                }
-            } else {
-                for (let i = 0; i < 4; i++) {
-                    newImgData.data[pos + i] = 255;
-                }
+
+          if (!insidePolygon(Point(x, y), polygon)) {
+            for (let i = 0; i < 4; i++) {
+                newImgData.data[newPos + i] = 255;
             }
+          }
+            //position du pixel courrant dans newImgData
+            let newPos = x * 4 + y * w * 4;
+            //position exacte du point après transformation inverse
+            let floatingPos = linearTransformationPoint(Point(x, y), invertMatrix);
+            //position arrondi "au plus proche" après transformation inverse
+            let roundedPos = Math.round(floatingPos.x) * 4 + Math.round(floatingPos.y) * w * 4;
+            for (let i = 0; i < 4; i++) {
+                newImgData.data[newPos + i] = imgData.data[roundedPos + i];
+              }
+
         }
     }
 
@@ -137,12 +110,12 @@ function polygonImageMatrix(ctx, imgData, polygon, invertMatrix) {
 }
 
 /**
- * @param {Point} point 
+ * @param {Point} point
  * @param {Polygon} polygon
- * 
- * @returns {Boolean} 
- * if point is inside polygon-> true  
- * else -> false 
+ *
+ * @returns {Boolean}
+ * if point is inside polygon-> true
+ * else -> false
  */
 function insidePolygon(point, polygon) {
 

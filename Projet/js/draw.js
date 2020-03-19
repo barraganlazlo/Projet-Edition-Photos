@@ -2,7 +2,7 @@
 function drawImage(ctx,img){
     ctx.canvas.width = img.width;
     ctx.canvas.height = img.height;
-    ctx.drawImage(ImageIn, 0,0);
+    ctx.drawImage(USER_DATAS.ImageIn, 0,0);
 }
 
 function drawKeysPoints(keyPoints,ctx, pointSelected = -1){

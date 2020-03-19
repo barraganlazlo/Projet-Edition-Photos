@@ -1,4 +1,34 @@
 /*********************************************************/
+/* POINTS                                               */
+/*********************************************************/
+/**
+ * Generate a point object
+ * @param {Number} x position x of the point
+ * @param {Number} y position y of the point
+ */
+function Point(x = 0, y = 0) {
+    return { x, y };
+}
+
+/**
+ * Generate a point object
+ * @param {Number} x position x of the point
+ * @param {Number} y position y of the point
+ */
+function Vector2(x = 0, y = 0) {
+    return { x, y };
+}
+
+/**
+ * Distance between to point
+ * @param {Number} a first point
+ * @param {Number} b second point
+ * @return { float }
+ */
+function distance(a, b) {
+    return Math.sqrt(((a.x - b.x) * (a.x - b.x)) + ((a.y - b.y) * (a.y - b.y)));
+}
+/*********************************************************/
 /* MATRIXS                                               */
 /*********************************************************/
 
@@ -131,8 +161,8 @@ function matrixScale(scale) {
     return Matrix3(scale, 0, 0, 0, scale, 0, 0, 0, 1);
 }
 
-function matrixTranslate(x, y) {
-    return Matrix3(1, 0, x, 0, 1, y, 0, 0, 1);
+function matrixTranslate(vec2) {
+    return Matrix3(1, 0, vec2.x, 0, 1, vec2.y, 0, 0, 1);
 }
 
 /*********************************************************/

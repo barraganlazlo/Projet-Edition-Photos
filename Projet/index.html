@@ -27,16 +27,30 @@
                 <canvas id="canvasOut" width="300" height="300" class="back-clear"></canvas>
             </div>
 
-            <div class="-flexCStart">
-                <label>
-                <input type="checkbox">
-                <span class="checkbox">
-                <p class="-margL">Filtre global</p>
-            </label>
-                <label class="-flexRStart">
-                <p class="-margR -bold">Valeur du scale</p>
-                <input type="number" name="scale" value="1" class="back-clear -roundest font-small padding-small">
-            </label>
+            <div class="-flexCStart -align-ifill">
+              <label class="-flexRStart">
+                <input type="checkbox" id="checkGlobal">
+                <span class="switches -roundest color-3 back-3 back--vvlight -shadow"></span>
+                <p class="-margL -light color-clear">Filtre global</p>
+              </label>
+              <label class="-flexRStart -margT">
+                <input id="scaleValue" type="number" name="scale" value="1" class="back-clear -rounded font-small padding-small -shadow">
+                <p class="-margL -light color-clear">Valeur du scale</p>
+              </label>
+              <label class="-flexRStart -margT">
+                <input id="rotationValue" type="number" name="scale" value="1" class="back-clear -rounded font-small padding-small -shadow">
+                <p class="-margL -light color-clear">Valeur de la rotation</p>
+              </label>
+              <div class="-flexRBetween -flexWrap">
+                <label class="-flexRStart -margT">
+                  <input id="translationX" type="number" name="scale" value="1" class="back-clear -rounded font-small padding-small -shadow">
+                  <p class="-margL -light color-clear">x</p>
+                </label>
+                <label class="-flexRStart -margT -margL">
+                  <input id="translationY" type="number" name="scale" value="1" class="back-clear -rounded font-small padding-small -shadow">
+                  <p class="-margL -light color-clear">y</p>
+                </label>
+              </div>
             </div>
         </section>
     </div>

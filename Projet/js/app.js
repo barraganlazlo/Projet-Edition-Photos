@@ -5,24 +5,6 @@
  * @author Romain_Saclier
  */
 
-/**
- * Generate a point object
- * @param {Number} x position x of the point
- * @param {Number} y position y of the point
- */
-function Point(x = 0, y = 0) {
-    return { x, y };
-}
-
-/**
- * Distance between to point
- * @param {Number} a first point
- * @param {Number} b second point
- * @return { float }
- */
-function distance(a, b) {
-    return Math.sqrt(((a.x - b.x) * (a.x - b.x)) + ((a.y - b.y) * (a.y - b.y)));
-}
 
 /**
  * Change mouse position with an event and a canvas
@@ -37,3 +19,41 @@ function setMousePos(canvas, e) {
 
 //Mouse position
 MOUSE = Point();
+
+let USER_DATAS = {
+  ImageIn : null,
+  global : false,
+  scale : 1,
+  rotation : 1,
+  translate : new Vector2(0,0),
+}
+
+/**
+ * loading imagecanvas
+ */
+const inputImageIn = document.getElementById("ImageIn");
+const btnImageIn = document.getElementById("btnImageIn");
+
+const checkGlobal = document.getElementById("checkGlobal");
+const scaleValue = document.getElementById("scaleValue");
+const rotationValue = document.getElementById("rotationValue");
+
+const translationX = document.getElementById("translationX");
+const translationY = document.getElementById("translationY");
+
+checkGlobal.addEventListener("change", (e) => { USER_DATAS.global = checkGlobal.checked; });
+scaleValue.addEventListener("change", (e) => { USER_DATAS.scale = parseInt(scaleValue.value); });
+rotationValue.addEventListener("change", (e) => { USER_DATAS.rotation = parseInt(rotationValue.value); });
+
+translationX.addEventListener("change", (e) => { USER_DATAS.translate.x = parseInt(translationX.value); });
+translationY.addEventListener("change", (e) => { USER_DATAS.translate.y = parseInt(translationY.value); });
+
+btnImageIn.addEventListener("click", () => {
+    inputImageIn.click();
+});
+
+inputImageIn.addEventListener("change", () => {
+    console.log("upload image ");
+    console.log(inputImageIn.files[0]);
+    USER_DATAS.ImageIn = loadImage(URL.createObjectURL(inputImageIn.files[0]));
+})
