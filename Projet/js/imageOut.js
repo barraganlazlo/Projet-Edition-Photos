@@ -36,19 +36,20 @@ function DrawOutContext(debug = true) {
     let newCenter;
     if(USER_DATAS.global){
 
-      let height_imageIn = USER_DATAS.ImageIn.height;
-      let width_imageIn = USER_DATAS.ImageIn.width;
+      let height_imageIn = ImageInData.height;
+      let width_imageIn = ImageInData.width;
 
       let translatetocenterMatrix = matrixTranslate(new Vector2(-Math.round(width_imageIn / 2), -Math.round(height_imageIn / 2)));
       let translatebackMatrix = matrixTranslate(new Vector2(Math.round(width_imageIn / 2), Math.round(height_imageIn / 2)));
-      finalMatrix = Matrix.mult(translatebackMatrix, rotateMatrix, scaleMatrix, translatetocenterMatrix);
+      finalMatrix = scaleMatrix;
       invertMatrix = Matrix.invert(finalMatrix);
+      console.log(invertMatrix, finalMatrix);
 
       //calculate height and width of the image after transformation
       let x0 = linearTransformationPoint(new Point(0,0), finalMatrix);
-      let x1 = linearTransformationPoint(new Point(USER_DATAS.ImageIn.width, 0), finalMatrix);
-      let x2 = linearTransformationPoint(new Point(USER_DATAS.ImageIn.width, USER_DATAS.ImageIn.height), finalMatrix);
-      let x3 = linearTransformationPoint(new Point(0, USER_DATAS.ImageIn.height), finalMatrix);
+      let x1 = linearTransformationPoint(new Point(width_imageIn, 0), finalMatrix);
+      let x2 = linearTransformationPoint(new Point(width_imageIn, height_imageIn), finalMatrix);
+      let x3 = linearTransformationPoint(new Point(0, height_imageIn), finalMatrix);
       x0 = roundPoint(x0);
       x1 = roundPoint(x1);
       x2 = roundPoint(x2);
@@ -58,14 +59,18 @@ function DrawOutContext(debug = true) {
       minMax.addValue(x1);
       minMax.addValue(x2);
       minMax.addValue(x3);
-
       h = minMax.maxPos.y - minMax.minPos.y;
-      w = minMax.maxPos.x - minMax.minPos.x;
+      w = (minMax.maxPos.x - minMax.minPos.x) * 2;
       console.log(w, h);
+      console.log(minMax);
 
       //Set extremum points polygone
-      outKeyPoints = [new Vector2(0,0),new Vector2(w,0),new Vector2(w,h),new Vector2(0,h)];
-
+      let originkeyPoints = [new Vector2(0,0),new Vector2(width_imageIn * 2,0),new Vector2(width_imageIn * 2,height_imageIn),new Vector2(0,height_imageIn)];
+      for (let i = 0; i < originkeyPoints.length; i++) {
+        outKeyPoints[i] = linearTransformationPoint(originkeyPoints[i], finalMatrix);
+      }
+      console.log(outKeyPoints);
+      newCenter = linearTransformationPoint(center, finalMatrix);
       setContextSize(ctxOut, w, h);
     }else{
       w = ImageInData.width;
@@ -96,7 +101,7 @@ function DrawOutContext(debug = true) {
     }
     ctxOut.putImageData(ImageOutData, 0, 0);
     //Draw Points
-    if (debug  && !USER_DATAS.global) {
+    if (debug) {
       drawKeysPoints(outKeyPoints, ctxOut);
       drawCross(newCenter, ctxOut);
     }

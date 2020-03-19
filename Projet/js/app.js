@@ -58,21 +58,21 @@ checkGlobal.addEventListener("change", (e) => {
   DrawOutContext();
 });
 scaleValue.addEventListener("change", (e) => {
-  USER_DATAS.scale = parseInt(scaleValue.value);
+  USER_DATAS.scale = parseFloat(scaleValue.value);
   DrawOutContext();
 
 });
 rotationValue.addEventListener("change", (e) => {
-  USER_DATAS.rotation = parseInt(rotationValue.value);
+  USER_DATAS.rotation = parseFloat(rotationValue.value);
   DrawOutContext();
 });
 
 translationX.addEventListener("change", (e) => {
-  USER_DATAS.translate.x = parseInt(translationX.value);
+  USER_DATAS.translate.x = parseFloat(translationX.value);
   DrawOutContext();
 });
 translationY.addEventListener("change", (e) => {
-  USER_DATAS.translate.y = parseInt(translationY.value);
+  USER_DATAS.translate.y = parseFloat(translationY.value);
   DrawOutContext();
 });
 
