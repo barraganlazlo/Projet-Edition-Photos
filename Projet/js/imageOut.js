@@ -39,7 +39,7 @@ function DrawOutContext(debug = true) {
     ImageInData = getImageData(ctxOut, USER_DATAS.ImageIn);
     drawDefaultBackground(ctxOut);
     let ImageOutDataScale = BoxFilter(ctxOut, ImageInData, copyKeyPoints, invertMatrix);
-    ctxOut.putImage(ImageOutDataScale);
+    ctxOut.putImageData(ImageOutDataScale, 0, 0);
   } else {
     drawDefaultBackground(ctxOut);
   }
