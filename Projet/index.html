@@ -21,6 +21,23 @@
                 <input type="file" id="ImageIn" class="back-1 color-clear -margALL" style="display:none;">
                 <button class="btn -roundest back-1" id="btnImageIn">Upload Image</button>
             </div>
+            <div class="-flexCStart -align-ifill">
+              <label class="-flexRStart -margT">
+                <input type="radio" value="Box" name="filterValue" checked onclick="filterChange(this)">
+                <span class="switches -roundest color-3 back-3 back--vvlight -shadow"></span>
+                <p class="-margL -light color-clear">Nearest Neighbor</p>
+              </label>
+              <label class="-flexRStart -margT">
+                <input type="radio" value="Bilinear" name="filterValue" onclick="filterChange(this)">
+                <span class="switches -roundest color-3 back-3 back--vvlight -shadow"></span>
+                <p class="-margL -light color-clear">Bilinear Interpolation</p>
+              </label>
+              <label class="-flexRStart -margT">
+                <input type="radio" value="Bicubic" name="filterValue" onclick="filterChange(this)">
+                <span class="switches -roundest color-3 back-3 back--vvlight -shadow"></span>
+                <p class="-margL -light color-clear">Bicubic Interpolation</p>
+              </label>
+            </div>
         </section>
         <section class="flex1 padding-very-long -flexCStart">
             <div class="-flexCStart back-clear -bordered bord-1 -bordsize-long -long margin-very-long">
@@ -38,16 +55,16 @@
                 <p class="-margL -light color-clear">Valeur du scale</p>
               </label>
               <label class="-flexRStart -margT">
-                <input id="rotationValue" type="number" name="scale" value="1" class="back-clear -rounded font-small padding-small -shadow">
+                <input id="rotationValue" type="number" name="scale" value="0" class="back-clear -rounded font-small padding-small -shadow">
                 <p class="-margL -light color-clear">Valeur de la rotation</p>
               </label>
               <div class="-flexRBetween -flexWrap">
                 <label class="-flexRStart -margT">
-                  <input id="translationX" type="number" name="scale" value="1" class="back-clear -rounded font-small padding-small -shadow">
+                  <input id="translationX" type="number" name="scale" value="0" class="back-clear -rounded font-small padding-small -shadow">
                   <p class="-margL -light color-clear">x</p>
                 </label>
                 <label class="-flexRStart -margT -margL">
-                  <input id="translationY" type="number" name="scale" value="1" class="back-clear -rounded font-small padding-small -shadow">
+                  <input id="translationY" type="number" name="scale" value="0" class="back-clear -rounded font-small padding-small -shadow">
                   <p class="-margL -light color-clear">y</p>
                 </label>
               </div>

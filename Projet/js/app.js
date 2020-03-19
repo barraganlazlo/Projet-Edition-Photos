@@ -26,7 +26,13 @@ let USER_DATAS = {
   scale: 1,
   rotation: 1,
   translate: new Vector2(0, 0),
-  filterType: "box",
+  /**
+   * Types possible :
+   *    - NearestNeighbor
+   *    - Bilinear
+   *    - Bicubic
+   */
+  interporlationType: "NearestNeighbor",
 }
 
 /**
@@ -43,7 +49,8 @@ const translationX = document.getElementById("translationX");
 const translationY = document.getElementById("translationY");
 
 function filterChange(radio) {
-  USER_DATAS.filterType = radio.value;
+  USER_DATAS.interporlationType = radio.value;
+  DrawOutContext();
 }
 
 checkGlobal.addEventListener("change", (e) => {
@@ -71,7 +78,7 @@ translationY.addEventListener("change", (e) => {
 
 btnImageIn.addEventListener("click", () => {
   inputImageIn.click();
-  DrawOutContext();  
+  DrawOutContext();
 });
 
 inputImageIn.addEventListener("change", () => {

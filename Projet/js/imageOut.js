@@ -25,7 +25,7 @@ function DrawOutContext(debug = true) {
   let translateMatrix = matrixTranslate(new Vector2(-center.x, -center.y));
   let translateMatrix2 = matrixTranslate(center);
   let scaleMatrix = matrixScale(USER_DATAS.scale);
-  let rotateMatrix = matrixRotation(USER_DATAS.rotation);
+  let rotateMatrix = matrixRotation(degrees_to_radians(USER_DATAS.rotation));
   let finalMatrix = Matrix.mult(translateMatrix2, rotateMatrix, scaleMatrix, translateMatrix);
   let invertMatrix = Matrix.invert(finalMatrix);
 
@@ -39,7 +39,19 @@ function DrawOutContext(debug = true) {
   if (USER_DATAS.ImageIn) {
     ImageInData = getImageData(ctxOut, USER_DATAS.ImageIn);
     drawDefaultBackground(ctxOut);
-    let ImageOutDataScale = Bilinear(ctxOut, ImageInData, copyKeyPoints, invertMatrix);
+
+    let ImageOutDataScale;
+    switch(USER_DATAS.interporlationType){
+      case "NearestNeighbor" :
+        ImageOutDataScale = Box(ctxOut, ImageInData, copyKeyPoints, invertMatrix);
+        break;
+      case "Bilinear" :
+        ImageOutDataScale = Bilinear(ctxOut, ImageInData, copyKeyPoints, invertMatrix);
+        break;
+      case "Bicubic" :
+        ImageOutDataScale = Bicubic(ctxOut, ImageInData, copyKeyPoints, invertMatrix);
+        break;
+    }
     ctxOut.putImageData(ImageOutDataScale, 0, 0);
   } else {
     drawDefaultBackground(ctxOut);
@@ -82,7 +94,7 @@ function clear(imgData) {
 *
 * @returns {ImageData} la nouvelle image data
 */
-function BoxFilter(ctx, imgData, polygon, invertMatrix) {
+function NearestNeighbor(ctx, imgData, polygon, invertMatrix) {
   let w = imgData.width;
   let h = imgData.height;
   let newImgData = ctx.createImageData(w, h);

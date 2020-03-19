@@ -28,6 +28,12 @@ function Vector2(x = 0, y = 0) {
 function distance(a, b) {
     return Math.sqrt(((a.x - b.x) * (a.x - b.x)) + ((a.y - b.y) * (a.y - b.y)));
 }
+
+function degrees_to_radians(degrees)
+{
+  var pi = Math.PI;
+  return degrees * (pi/180);
+}
 /*********************************************************/
 /* MATRIXS                                               */
 /*********************************************************/
