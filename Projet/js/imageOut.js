@@ -24,7 +24,7 @@ function DrawOutContext(debug = true) {
 
   copyKeyPoints = [];
   let translateMatrix = matrixTranslate(new Vector2(-center.x, -center.y));
-  let translateMatrix2 = matrixTranslate(center.x, center.y);
+  let translateMatrix2 = matrixTranslate(center);
   let finalMatrix = Matrix.mult(translateMatrix2, rotateMatrix, scaleMatrix, translateMatrix);
   let invertMatrix = Matrix.invert(finalMatrix);
 
