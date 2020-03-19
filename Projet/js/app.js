@@ -48,23 +48,30 @@ function filterChange(radio) {
 
 checkGlobal.addEventListener("change", (e) => {
   USER_DATAS.global = checkGlobal.checked;
+  DrawOutContext();
 });
 scaleValue.addEventListener("change", (e) => {
   USER_DATAS.scale = parseInt(scaleValue.value);
+  DrawOutContext();
+
 });
 rotationValue.addEventListener("change", (e) => {
   USER_DATAS.rotation = parseInt(rotationValue.value);
+  DrawOutContext();
 });
 
 translationX.addEventListener("change", (e) => {
   USER_DATAS.translate.x = parseInt(translationX.value);
+  DrawOutContext();
 });
 translationY.addEventListener("change", (e) => {
   USER_DATAS.translate.y = parseInt(translationY.value);
+  DrawOutContext();
 });
 
 btnImageIn.addEventListener("click", () => {
   inputImageIn.click();
+  DrawOutContext();  
 });
 
 inputImageIn.addEventListener("change", () => {

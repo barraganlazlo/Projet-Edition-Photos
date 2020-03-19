@@ -13,8 +13,7 @@ let ctxOut = canvasOut.getContext('2d');
 let ImageInData;
 
 let copyKeyPoints = [];
-let scaleMatrix = matrixScale(8);
-let rotateMatrix = matrixRotation(0);
+
 
 /**
 * Draw canvas' out context
@@ -25,6 +24,8 @@ function DrawOutContext(debug = true) {
   copyKeyPoints = [];
   let translateMatrix = matrixTranslate(new Vector2(-center.x, -center.y));
   let translateMatrix2 = matrixTranslate(center);
+  let scaleMatrix = matrixScale(USER_DATAS.scale);
+  let rotateMatrix = matrixRotation(USER_DATAS.rotation);
   let finalMatrix = Matrix.mult(translateMatrix2, rotateMatrix, scaleMatrix, translateMatrix);
   let invertMatrix = Matrix.invert(finalMatrix);
 
@@ -119,6 +120,51 @@ function BoxFilter(ctx, imgData, polygon, invertMatrix) {
 * @returns {ImageData} la nouvelle image data
 */
 function Bilinear(ctx, imgData, polygon, invertMatrix) {
+  let w = imgData.width;
+  let h = imgData.height;
+  let newImgData = ctx.createImageData(w, h);
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      //position du pixel courrant dans newImgData
+      let newPos = x * 4 + y * w * 4;
+
+      if (!insidePolygon(Point(x, y), polygon)) {
+        for (let i = 0; i < 4; i++) {
+          newImgData.data[newPos + i] = 255;
+        }
+        continue;
+      }
+      //position exacte du point après transformation inverse
+      let floatingPos = linearTransformationPoint(Point(x, y), invertMatrix);
+      //position arrondi "au plus proche" après transformation inverse
+      let i = Math.floor(floatingPos.x);
+      let j = Math.floor(floatingPos.y);
+      let t = floatingPos.x - i; //Horizontal Distance with i
+      let u = floatingPos.y - j; //Vertical Distance with j
+      //Loop for RGBA
+      for (let k = 0; k < 4; k++) {
+        let va = (1 - u) * imgData.data[(j*w + i)*4 + k] + u * imgData.data[((j+1)*w + i)*4 + k];
+        let vb = (1 - u) * imgData.data[(j*w + i+1)*4 + k] + u * imgData.data[((j+1)*w + i+1)*4 + k ];
+        newImgData.data[newPos + k] = (1-t) * va + t *vb;
+      }
+    }
+  }
+
+  return newImgData;
+}
+
+/**
+*
+* @param {Context} ctx le context dans lequel on crée la nouvelle image
+* @param {ImageData} imgData l'image data de l'image d'origine
+* @param {Polygon} polygon le polygone transformé
+* @param {Matrix} invertMatrix la matrice inverce de la transformation qu'à reçu le polygone
+*
+* @returns {ImageData} la nouvelle image data
+*/
+//TODO
+function Bicubic(ctx, imgData, polygon, invertMatrix) {
   let w = imgData.width;
   let h = imgData.height;
   let newImgData = ctx.createImageData(w, h);
