@@ -127,15 +127,15 @@ const Matrix = {
         return Matrix3(_a, _b, _c, _d, _e, _f, _g, _h, _i);
     },
     mult(a, b, ...other) {
-        let _a = a[0][0] * b[0][0] + a[0][1] * b[1][0] + a[0][2] * b[2][0];
-        let _b = a[0][0] * b[0][1] + a[0][1] * b[1][1] + a[0][2] * b[2][1];
-        let _c = a[0][0] * b[0][2] + a[0][1] * b[1][2] + a[0][2] * b[2][2];
-        let _d = a[1][0] * b[0][0] + a[1][1] * b[1][0] + a[1][2] * b[2][0];
-        let _e = a[1][0] * b[0][1] + a[1][1] * b[1][1] + a[1][2] * b[2][1];
-        let _f = a[1][0] * b[0][2] + a[1][1] * b[1][2] + a[1][2] * b[2][2];
-        let _g = a[2][0] * b[0][0] + a[2][1] * b[1][0] + a[2][2] * b[2][0];
-        let _h = a[2][0] * b[0][1] + a[2][1] * b[1][1] + a[2][2] * b[2][1];
-        let _i = a[2][0] * b[0][2] + a[2][1] * b[1][2] + a[2][2] * b[2][2];
+        let _a = addFloat(a[0][0] * b[0][0], a[0][1] * b[1][0], a[0][2] * b[2][0]);
+        let _b = addFloat(a[0][0] * b[0][1], a[0][1] * b[1][1], a[0][2] * b[2][1]);
+        let _c = addFloat(a[0][0] * b[0][2], a[0][1] * b[1][2], a[0][2] * b[2][2]);
+        let _d = addFloat(a[1][0] * b[0][0], a[1][1] * b[1][0], a[1][2] * b[2][0]);
+        let _e = addFloat(a[1][0] * b[0][1], a[1][1] * b[1][1], a[1][2] * b[2][1]);
+        let _f = addFloat(a[1][0] * b[0][2], a[1][1] * b[1][2], a[1][2] * b[2][2]);
+        let _g = addFloat(a[2][0] * b[0][0], a[2][1] * b[1][0], a[2][2] * b[2][0]);
+        let _h = addFloat(a[2][0] * b[0][1], a[2][1] * b[1][1], a[2][2] * b[2][1]);
+        let _i = addFloat(a[2][0] * b[0][2], a[2][1] * b[1][2], a[2][2] * b[2][2]);
         let matrix3 = Matrix3(_a, _b, _c, _d, _e, _f, _g, _h, _i);
         if (other.length == 0) return matrix3;
         return Matrix.mult(matrix3, ...other);
@@ -207,6 +207,11 @@ const Matrix = {
                 }
             }
         }
+        for(let i; i < I.length; i++){
+          for(let j; j < I.length; j++){
+            I[i][j] = roundFloat(I[i][j]);
+          }
+        }
         return I;
     }
 }
@@ -233,6 +238,6 @@ function matrixTranslate(vec2) {
  * return a new Vector2
  */
 function linearTransformationPoint(point, matrix3) {
-  return Point(point.x * matrix3[0][0] + point.y * matrix3[0][1] + matrix3[0][2], point.x * matrix3[1][0] + point.y * matrix3[1][1] + matrix3[1][2]);
+  return Point(addFloat(point.x * matrix3[0][0], point.y * matrix3[0][1], matrix3[0][2]), addFloat(point.x * matrix3[1][0], point.y * matrix3[1][1], matrix3[1][2]));
   //return Point(roundFloat(point.x * matrix3[0][0] + point.y * matrix3[0][1] + matrix3[0][2]), roundFloat(point.x * matrix3[1][0] + point.y * matrix3[1][1] + matrix3[1][2]));
 }

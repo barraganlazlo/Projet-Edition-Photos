@@ -29,7 +29,6 @@ function DrawOutContext(debug = false) {
 
     let scaleMatrix = matrixScale(USER_DATAS.scale);
     let rotateMatrix = matrixRotation(degrees_to_radians(USER_DATAS.rotation));
-    console.log(USER_DATAS.rotation);
     let finalMatrix;
     let invertMatrix;
     let w,h;
@@ -46,9 +45,9 @@ function DrawOutContext(debug = false) {
 
       //calculate height and width of the image after transformation
       let x0 = linearTransformationPoint(new Point(0,0), finalMatrix);
-      let x1 = linearTransformationPoint(new Point(width_imageIn, 0), finalMatrix);
-      let x2 = linearTransformationPoint(new Point(width_imageIn, height_imageIn), finalMatrix);
-      let x3 = linearTransformationPoint(new Point(0, height_imageIn), finalMatrix);
+      let x1 = linearTransformationPoint(new Point(width_imageIn-1, 0), finalMatrix);
+      let x2 = linearTransformationPoint(new Point(width_imageIn-1, height_imageIn-1), finalMatrix);
+      let x3 = linearTransformationPoint(new Point(0, height_imageIn-1), finalMatrix);
       //round
       // x0 = roundPoint(x0);
       // x1 = roundPoint(x1);
@@ -72,10 +71,11 @@ function DrawOutContext(debug = false) {
       x0 = linearTransformationPoint(new Point(0,0), finalMatrix);
       x1 = linearTransformationPoint(new Point(width_imageIn, 0), finalMatrix);
       x2 = linearTransformationPoint(new Point(width_imageIn, height_imageIn), finalMatrix);
-      x3 = linearTransformationPoint(new Point(0, height_imageIn), finalMatrix)
+      x3 = linearTransformationPoint(new Point(0, height_imageIn), finalMatrix);
+      console.log(finalMatrix);
 
-      h = minMax.maxPos.y - minMax.minPos.y;
-      w = minMax.maxPos.x - minMax.minPos.x;
+      h = 1 + minMax.maxPos.y - minMax.minPos.y;
+      w = 1 + minMax.maxPos.x - minMax.minPos.x;
       console.log(w, h);
       // console.log(minMax);
 
@@ -98,7 +98,7 @@ function DrawOutContext(debug = false) {
         outKeyPoints[i] = linearTransformationPoint(keyPoints[i], finalMatrix);
       }
     }
-    console.log(invertMatrix);
+    console.log("invertMatrix", invertMatrix);
     setContextSize(ctxOut, w, h);
     switch(USER_DATAS.interporlationType){
       case "NearestNeighbor" :
@@ -112,7 +112,7 @@ function DrawOutContext(debug = false) {
         break;
     }
     drawDefaultBackground(ctxOut);
-    console.log(ImageOutData.data[0]);
+    console.log("data[0]",ImageOutData.data[0]);
     ctxOut.putImageData(ImageOutData, 0, 0);
     //Draw Points
     if (debug) {
@@ -166,7 +166,7 @@ function NearestNeighbor(ctx, imgData, polygon, invertMatrix) {
       //position du pixel courrant dans newImgData
       let newPos = x * 4 + y * w_out * 4;
 
-      if (!insidePolygon(Point(x, y), polygon)) {
+      if (!insidePolygon(Point(x, y), polygon)&& !USER_DATAS.global) {
         for (let i = 0; i < 4; i++) {
           if(USER_DATAS.global) newImgData.data[newPos + i] = 255;
           else newImgData.data[newPos + i] = imgData.data[newPos + i];
@@ -175,16 +175,18 @@ function NearestNeighbor(ctx, imgData, polygon, invertMatrix) {
       }
       //position exacte du point après transformation inverse
       let floatingPos = linearTransformationPoint(Point(x, y), invertMatrix);
-      if(x == 0 && y ==  0 || x == w_out - 1 && y == h_out - 1) console.log("floatingPos : ",floatingPos);
+      if(x == 0 && y ==  0 ) console.log("floatingPos 0,0 : ",floatingPos);
+      if( x == w_out - 1 && y == h_out - 1)console.log("floatingPos w-1,h-1 : ",floatingPos);
       //position arrondi "au plus proche" après transformation inverse
       let roundedPos = { x: Math.floor(floatingPos.x), y: Math.floor(floatingPos.y)} ;
-      if(x == 0 && y ==  0 || x == w_out - 1 && y == h_out - 1) console.log("roundedPos : ",roundedPos);
+      if(x == 0 && y ==  0 ) console.log("roundedPos 0,0 : ",roundedPos);
+      if( x == w_out - 1 && y == h_out - 1)console.log("roundedPos w-1,h-1 : ",roundedPos);
 
       let pixelroundedPos= roundedPos.y * w * 4 + roundedPos.x *4;
       for (let i = 0; i < 4; i++) {
         newImgData.data[newPos + i] = imgData.data[pixelroundedPos + i];
         if(x == 0 && y ==  0 || x == w_out - 1 && y == h_out - 1){
-          console.log(pixelroundedPos + i, imgData.data[pixelroundedPos + i]);
+          //console.log(pixelroundedPos + i, imgData.data[pixelroundedPos + i]);
         }
       }
     }
@@ -214,7 +216,7 @@ function Bilinear(ctx, imgData, polygon, invertMatrix) {
       //position du pixel courrant dans newImgData
       let newPos = x * 4 + y * w_out * 4;
 
-      if (!insidePolygon(Point(x, y), polygon)) {
+      if (!insidePolygon(Point(x, y), polygon) && !USER_DATAS.global ) {
         for (let i = 0; i < 4; i++) {
           if(USER_DATAS.global) newImgData.data[newPos + i] = 255;
           else newImgData.data[newPos + i] = imgData.data[newPos + i];
@@ -228,11 +230,23 @@ function Bilinear(ctx, imgData, polygon, invertMatrix) {
       let j = Math.floor(floatingPos.y);
       let t = floatingPos.x - i; //Horizontal Distance with i
       let u = floatingPos.y - j; //Vertical Distance with j
+      if( x == 0 && y == 0)console.log("floatingPos 0,0 : ",floatingPos);
+      if( x == 0 && y == 0)console.log("i,j 0,0 : ",i,j);
       //Loop for RGBA
+      let va=0,vb=0;
       for (let k = 0; k < 4; k++) {
-        let va = (1 - u) * imgData.data[(j*w + i)*4 + k] + u * imgData.data[((j+1)*w + i)*4 + k];
-        let vb = (1 - u) * imgData.data[(j*w + i+1)*4 + k] + u * imgData.data[((j+1)*w + i+1)*4 + k ];
-        newImgData.data[newPos + k] = (1-t) * va + t *vb;
+        va=(1 - u) * imgData.data[(j*w + i)*4 + k];
+        vb=va;
+        if(j<h-1){
+          va=addFloat(va, u * imgData.data[((j+1)*w + i)*4 + k]);
+        }
+        if(i<w-1){
+          vb=(1 - u) * imgData.data[(j*w + i+1)*4 + k];
+        }
+        if(j<h-1 && i<w-1){
+          vb=addFloat(vb, u * imgData.data[((j+1)*w + i+1)*4 + k ]);
+        }
+        newImgData.data[newPos + k] = addFloat( (1-t) * va, t *vb);
       }
     }
   }
@@ -391,8 +405,8 @@ function insidePolygon(point, polygon) {
     let xj = polygon[j].x,
     yj = polygon[j].y;
 
-    let intersect = ((yi > y) != (yj > y)) &&
-    (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+    let intersect = (((yi > y) != (yj > y))  && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) ;
+
     if (intersect) inside = !inside;
   }
 
