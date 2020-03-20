@@ -19,7 +19,7 @@ let outKeyPoints = [];
 * Draw canvas' out context
 * @param {Boolean} debug draw polygon points
 */
-function DrawOutContext(debug = true) {
+function DrawOutContext(debug = false) {
 
   let scaleMatrix = matrixScale(USER_DATAS.scale);
   let rotateMatrix = matrixRotation(degrees_to_radians(USER_DATAS.rotation));
@@ -41,15 +41,15 @@ function DrawOutContext(debug = true) {
 
       let translatetocenterMatrix = matrixTranslate(new Vector2(-Math.round(width_imageIn / 2), -Math.round(height_imageIn / 2)));
       let translatebackMatrix = matrixTranslate(new Vector2(Math.round(width_imageIn / 2), Math.round(height_imageIn / 2)));
-      finalMatrix = scaleMatrix;
-      invertMatrix = Matrix.invert(finalMatrix);
+      finalMatrix = Matrix.mult(translatebackMatrix, rotateMatrix, scaleMatrix, translatetocenterMatrix);
       console.log(invertMatrix, finalMatrix);
 
       //calculate height and width of the image after transformation
       let x0 = linearTransformationPoint(new Point(0,0), finalMatrix);
-      let x1 = linearTransformationPoint(new Point(width_imageIn, 0), finalMatrix);
-      let x2 = linearTransformationPoint(new Point(width_imageIn, height_imageIn), finalMatrix);
-      let x3 = linearTransformationPoint(new Point(0, height_imageIn), finalMatrix);
+      let x1 = linearTransformationPoint(new Point(width_imageIn -1, 0), finalMatrix);
+      let x2 = linearTransformationPoint(new Point(width_imageIn -1, height_imageIn -1), finalMatrix);
+      let x3 = linearTransformationPoint(new Point(0, height_imageIn -1), finalMatrix);
+      //round
       x0 = roundPoint(x0);
       x1 = roundPoint(x1);
       x2 = roundPoint(x2);
@@ -59,19 +59,24 @@ function DrawOutContext(debug = true) {
       minMax.addValue(x1);
       minMax.addValue(x2);
       minMax.addValue(x3);
+
+      let translateCorrection = matrixTranslate(new Vector2(- minMax.minPos.x, - minMax.minPos.y));
+      finalMatrix = Matrix.mult(translateCorrection, finalMatrix);
+      invertMatrix = Matrix.invert(finalMatrix);
+      x0 = linearTransformationPoint(x0, translateCorrection);
+      x1 = linearTransformationPoint(x1, translateCorrection);
+      x2 = linearTransformationPoint(x2, translateCorrection);
+      x3 = linearTransformationPoint(x3, translateCorrection);
+
       h = minMax.maxPos.y - minMax.minPos.y;
-      w = (minMax.maxPos.x - minMax.minPos.x) * 2;
+      w = minMax.maxPos.x - minMax.minPos.x;
       console.log(w, h);
       console.log(minMax);
 
       //Set extremum points polygone
-      let originkeyPoints = [new Vector2(0,0),new Vector2(width_imageIn * 2,0),new Vector2(width_imageIn * 2,height_imageIn),new Vector2(0,height_imageIn)];
-      for (let i = 0; i < originkeyPoints.length; i++) {
-        outKeyPoints[i] = linearTransformationPoint(originkeyPoints[i], finalMatrix);
-      }
+      outKeyPoints = [x0,x1,x2,x3];
       console.log(outKeyPoints);
       newCenter = linearTransformationPoint(center, finalMatrix);
-      setContextSize(ctxOut, w, h);
     }else{
       w = ImageInData.width;
       h = ImageInData.height;
@@ -87,16 +92,16 @@ function DrawOutContext(debug = true) {
         outKeyPoints[i] = linearTransformationPoint(keyPoints[i], finalMatrix);
       }
     }
-
+    setContextSize(ctxOut, w, h);
     switch(USER_DATAS.interporlationType){
       case "NearestNeighbor" :
-        ImageOutData = NearestNeighbor(ctxOut, ImageInData, w, h, outKeyPoints, invertMatrix);
+        ImageOutData = NearestNeighbor(ctxOut, ImageInData, outKeyPoints, invertMatrix);
         break;
       case "Bilinear" :
-        ImageOutData = Bilinear(ctxOut, ImageInData, w, h, outKeyPoints, invertMatrix);
+        ImageOutData = Bilinear(ctxOut, ImageInData, outKeyPoints, invertMatrix);
         break;
       case "Bicubic" :
-        ImageOutData = Bicubic(ctxOut, ImageInData, w, h, outKeyPoints, invertMatrix);
+        ImageOutData = Test(ctxOut, ImageInData, outKeyPoints, invertMatrix);
         break;
     }
     ctxOut.putImageData(ImageOutData, 0, 0);
@@ -140,16 +145,22 @@ function clear(imgData) {
 *
 * @returns {ImageData} newImgData la nouvelle image data
 */
-function NearestNeighbor(ctx, imgData, w, h, polygon, invertMatrix) {
-  let newImgData = ctx.createImageData(w, h);
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
+function NearestNeighbor(ctx, imgData, polygon, invertMatrix) {
+  let w = imgData.width;
+  let h = imgData.height;
+  let w_out = ctx.canvas.width;
+  let h_out = ctx.canvas.height;
+
+  let newImgData = ctx.createImageData(w_out, h_out);
+  for (let y = 0; y < h_out; y++) {
+    for (let x = 0; x < w_out; x++) {
       //position du pixel courrant dans newImgData
-      let newPos = x * 4 + y * w * 4;
+      let newPos = x * 4 + y * w_out * 4;
 
       if (!insidePolygon(Point(x, y), polygon)) {
         for (let i = 0; i < 4; i++) {
-          newImgData.data[newPos + i] = 255;
+          if(USER_DATAS.global) newImgData.data[newPos + i] = 255;
+          else newImgData.data[newPos + i] = imgData.data[newPos + i];
         }
         continue;
       }
@@ -175,13 +186,65 @@ function NearestNeighbor(ctx, imgData, w, h, polygon, invertMatrix) {
 *
 * @returns {ImageData} la nouvelle image data
 */
-function Bilinear(ctx, imgData, w, h, polygon, invertMatrix) {
-  let newImgData = ctx.createImageData(w, h);
+function Bilinear(ctx, imgData, polygon, invertMatrix) {
+  let w = imgData.width;
+  let h = imgData.height;
+  let w_out = ctx.canvas.width;
+  let h_out = ctx.canvas.height;
+  let newImgData = ctx.createImageData(w_out, h_out);
 
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
+  for (let y = 0; y < h_out; y++) {
+    for (let x = 0; x < w_out; x++) {
       //position du pixel courrant dans newImgData
-      let newPos = x * 4 + y * w * 4;
+      let newPos = x * 4 + y * w_out * 4;
+
+      if (!insidePolygon(Point(x, y), polygon)) {
+        for (let i = 0; i < 4; i++) {
+          if(USER_DATAS.global) newImgData.data[newPos + i] = 255;
+          else newImgData.data[newPos + i] = imgData.data[newPos + i];
+        }
+        continue;
+      }
+      //position exacte du point après transformation inverse
+      let floatingPos = linearTransformationPoint(Point(x, y), invertMatrix);
+      //position arrondi "au plus proche" après transformation inverse
+      let i = Math.floor(floatingPos.x);
+      let j = Math.floor(floatingPos.y);
+      let t = floatingPos.x - i; //Horizontal Distance with i
+      let u = floatingPos.y - j; //Vertical Distance with j
+      //Loop for RGBA
+      for (let k = 0; k < 4; k++) {
+        let va = (1 - u) * imgData.data[(j*w + i)*4 + k] + u * imgData.data[((j+1)*w + i)*4 + k];
+        let vb = (1 - u) * imgData.data[(j*w + i+1)*4 + k] + u * imgData.data[((j+1)*w + i+1)*4 + k ];
+        newImgData.data[newPos + k] = (1-t) * va + t *vb;
+      }
+    }
+  }
+
+  return newImgData;
+}
+
+
+/**
+*
+* @param {Context} ctx le context dans lequel on crée la nouvelle image
+* @param {ImageData} imgData l'image data de l'image d'origine
+* @param {Polygon} polygon le polygone transformé
+* @param {Matrix} invertMatrix la matrice inverce de la transformation qu'à reçu le polygone
+*
+* @returns {ImageData} la nouvelle image data
+*/
+function Bicubic(ctx, imgData, polygon, invertMatrix) {
+  let w = imgData.width;
+  let h = imgData.height;
+  let w_out = ctx.canvas.width;
+  let h_out = ctx.canvas.height;
+  let newImgData = ctx.createImageData(w_out, h_out);
+
+  for (let y = 0; y < h_out; y++) {
+    for (let x = 0; x < w_out; x++) {
+      //position du pixel courrant dans newImgData
+      let newPos = x * 4 + y * w_out * 4;
 
       if (!insidePolygon(Point(x, y), polygon)) {
         for (let i = 0; i < 4; i++) {
@@ -208,6 +271,7 @@ function Bilinear(ctx, imgData, w, h, polygon, invertMatrix) {
   return newImgData;
 }
 
+
 /**
 *
 * @param {Context} ctx le context dans lequel on crée la nouvelle image
@@ -217,14 +281,17 @@ function Bilinear(ctx, imgData, w, h, polygon, invertMatrix) {
 *
 * @returns {ImageData} la nouvelle image data
 */
-//TODO
-function Bicubic(ctx, imgData, w, h, polygon, invertMatrix) {
-  let newImgData = ctx.createImageData(w, h);
+function Test(ctx, imgData, polygon, invertMatrix) {
+  let w = imgData.width;
+  let h = imgData.height;
+  let w_out = ctx.canvas.width;
+  let h_out = ctx.canvas.height;
+  let newImgData = ctx.createImageData(w_out, h_out);
 
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
+  for (let y = 0; y < h_out; y++) {
+    for (let x = 0; x < w_out; x++) {
       //position du pixel courrant dans newImgData
-      let newPos = x * 4 + y * w * 4;
+      let newPos = x * 4 + y * w_out * 4;
 
       if (!insidePolygon(Point(x, y), polygon)) {
         for (let i = 0; i < 4; i++) {
@@ -237,18 +304,20 @@ function Bicubic(ctx, imgData, w, h, polygon, invertMatrix) {
       //position arrondi "au plus proche" après transformation inverse
       let i = Math.floor(floatingPos.x);
       let j = Math.floor(floatingPos.y);
-      let t = floatingPos.x - i;
-      let u = floatingPos.y - j;
+
+
+      //Loop for RGBA
       for (let k = 0; k < 4; k++) {
-        let va = (1 - u) * imgData.data[(j*w + i)*4 + k] + u * imgData.data[((j+1)*w + i)*4 + k];
-        let vb = (1 - u) * imgData.data[(j*w + i+1)*4 + k] + u * imgData.data[((j+1)*w + i+1)*4 + k ];
-        newImgData.data[newPos + k] = (1-t) * va + t *vb;
+
+        newImgData.data[newPos + k] = 255;
       }
     }
   }
 
   return newImgData;
 }
+
+
 
 // ImgData, x, y, h, w, matriceConvolution
 /**    | v v
