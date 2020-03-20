@@ -47,8 +47,17 @@ function roundFloatPoint(point){
   return point;
 }
 
-function roundFloat(x){
-  return Math.round(x*Math.pow(10,4))/Math.pow(10,4);
+function roundFloat(x, nbDecimal = 10){
+  return Math.round(x*Math.pow(10,nbDecimal))/Math.pow(10,nbDecimal);
+}
+
+function addFloat(...x){
+  let total = 0;
+  for(let i =0 ; i < x.length; i++){
+    total += x[i] ;
+    total = roundFloat(total);
+  }
+  return  total;
 }
 
 /**
@@ -75,7 +84,7 @@ class MinMaxVector2 {
 function degrees_to_radians(degrees)
 {
   let pi = Math.PI;
-  return degrees * (pi/180);
+  return (degrees * pi)/180;
 }
 /*********************************************************/
 /* MATRIXS                                               */

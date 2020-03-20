@@ -21,26 +21,27 @@ let outKeyPoints = [];
 */
 function DrawOutContext(debug = false) {
 
-  let scaleMatrix = matrixScale(USER_DATAS.scale);
-  let rotateMatrix = matrixRotation(degrees_to_radians(USER_DATAS.rotation));
-  console.log(USER_DATAS.rotation);
-  let finalMatrix;
-  let invertMatrix;
-  let w,h;
-  outKeyPoints = [];
+
   //Draw Image
   if (USER_DATAS.ImageIn) {
     ImageInData = getImageData(ctxOut, USER_DATAS.ImageIn);
-    drawDefaultBackground(ctxOut);
     let ImageOutData;
+
+    let scaleMatrix = matrixScale(USER_DATAS.scale);
+    let rotateMatrix = matrixRotation(degrees_to_radians(USER_DATAS.rotation));
+    console.log(USER_DATAS.rotation);
+    let finalMatrix;
+    let invertMatrix;
+    let w,h;
+    outKeyPoints = [];
     let newCenter;
     if(USER_DATAS.global){
 
       let height_imageIn = ImageInData.height;
       let width_imageIn = ImageInData.width;
 
-      let translatetocenterMatrix = matrixTranslate(new Vector2(-Math.round(width_imageIn / 2), -Math.round(height_imageIn / 2)));
-      let translatebackMatrix = matrixTranslate(new Vector2(Math.round(width_imageIn / 2), Math.round(height_imageIn / 2)));
+      let translatetocenterMatrix = matrixTranslate(new Vector2(- width_imageIn / 2, - height_imageIn / 2));
+      let translatebackMatrix = matrixTranslate(new Vector2(width_imageIn / 2, height_imageIn / 2));
       finalMatrix = Matrix.mult(translatebackMatrix, rotateMatrix, scaleMatrix, translatetocenterMatrix);
 
       //calculate height and width of the image after transformation
@@ -76,7 +77,7 @@ function DrawOutContext(debug = false) {
       h = minMax.maxPos.y - minMax.minPos.y;
       w = minMax.maxPos.x - minMax.minPos.x;
       console.log(w, h);
-      console.log(minMax);
+      // console.log(minMax);
 
       //Set extremum points polygone
       outKeyPoints = [x0,x1,x2,x3];
@@ -110,6 +111,8 @@ function DrawOutContext(debug = false) {
         ImageOutData = Test(ctxOut, ImageInData, outKeyPoints, invertMatrix);
         break;
     }
+    drawDefaultBackground(ctxOut);
+    console.log(ImageOutData.data[0]);
     ctxOut.putImageData(ImageOutData, 0, 0);
     //Draw Points
     if (debug) {
@@ -172,14 +175,16 @@ function NearestNeighbor(ctx, imgData, polygon, invertMatrix) {
       }
       //position exacte du point après transformation inverse
       let floatingPos = linearTransformationPoint(Point(x, y), invertMatrix);
-      if(x == 0 && y ==  0 || x == w_out - 1 && y == h_out - 1) console.log(floatingPos);
+      if(x == 0 && y ==  0 || x == w_out - 1 && y == h_out - 1) console.log("floatingPos : ",floatingPos);
       //position arrondi "au plus proche" après transformation inverse
-      let roundedPos = Math.round(floatingPos.x - 0.0001) * 4 + Math.round(floatingPos.y - 0.0001) * w * 4;
+      let roundedPos = { x: Math.floor(floatingPos.x), y: Math.floor(floatingPos.y)} ;
+      if(x == 0 && y ==  0 || x == w_out - 1 && y == h_out - 1) console.log("roundedPos : ",roundedPos);
 
+      let pixelroundedPos= roundedPos.y * w * 4 + roundedPos.x *4;
       for (let i = 0; i < 4; i++) {
-        newImgData.data[newPos + i] = imgData.data[roundedPos + i];
+        newImgData.data[newPos + i] = imgData.data[pixelroundedPos + i];
         if(x == 0 && y ==  0 || x == w_out - 1 && y == h_out - 1){
-          console.log(roundedPos + i, imgData.data[roundedPos + i]);
+          console.log(pixelroundedPos + i, imgData.data[pixelroundedPos + i]);
         }
       }
     }
