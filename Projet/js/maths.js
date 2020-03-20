@@ -29,11 +29,26 @@ function distance(a, b) {
     return Math.sqrt(((a.x - b.x) * (a.x - b.x)) + ((a.y - b.y) * (a.y - b.y)));
 }
 
+function floorPoint(point){
+  point.x=Math.floor(point.x);
+  point.y=Math.floor(point.y);
+  return point;
+}
 
 function roundPoint(point){
   point.x=Math.round(point.x);
   point.y=Math.round(point.y);
   return point;
+}
+
+function roundFloatPoint(point){
+  point.x=roundFloat(point.x);
+  point.y=roundFloat(point.y);
+  return point;
+}
+
+function roundFloat(x){
+  return Math.round(x*Math.pow(10,4))/Math.pow(10,4);
 }
 
 /**
@@ -59,7 +74,7 @@ class MinMaxVector2 {
 */
 function degrees_to_radians(degrees)
 {
-  var pi = Math.PI;
+  let pi = Math.PI;
   return degrees * (pi/180);
 }
 /*********************************************************/
@@ -209,5 +224,6 @@ function matrixTranslate(vec2) {
  * return a new Vector2
  */
 function linearTransformationPoint(point, matrix3) {
-    return Point(point.x * matrix3[0][0] + point.y * matrix3[0][1] + matrix3[0][2], point.x * matrix3[1][0] + point.y * matrix3[1][1] + matrix3[1][2]);
+  return Point(point.x * matrix3[0][0] + point.y * matrix3[0][1] + matrix3[0][2], point.x * matrix3[1][0] + point.y * matrix3[1][1] + matrix3[1][2]);
+  //return Point(roundFloat(point.x * matrix3[0][0] + point.y * matrix3[0][1] + matrix3[0][2]), roundFloat(point.x * matrix3[1][0] + point.y * matrix3[1][1] + matrix3[1][2]));
 }

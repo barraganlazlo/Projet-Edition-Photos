@@ -42,31 +42,36 @@ function DrawOutContext(debug = false) {
       let translatetocenterMatrix = matrixTranslate(new Vector2(-Math.round(width_imageIn / 2), -Math.round(height_imageIn / 2)));
       let translatebackMatrix = matrixTranslate(new Vector2(Math.round(width_imageIn / 2), Math.round(height_imageIn / 2)));
       finalMatrix = Matrix.mult(translatebackMatrix, rotateMatrix, scaleMatrix, translatetocenterMatrix);
-      console.log(invertMatrix, finalMatrix);
 
       //calculate height and width of the image after transformation
       let x0 = linearTransformationPoint(new Point(0,0), finalMatrix);
-      let x1 = linearTransformationPoint(new Point(width_imageIn -1, 0), finalMatrix);
-      let x2 = linearTransformationPoint(new Point(width_imageIn -1, height_imageIn -1), finalMatrix);
-      let x3 = linearTransformationPoint(new Point(0, height_imageIn -1), finalMatrix);
+      let x1 = linearTransformationPoint(new Point(width_imageIn, 0), finalMatrix);
+      let x2 = linearTransformationPoint(new Point(width_imageIn, height_imageIn), finalMatrix);
+      let x3 = linearTransformationPoint(new Point(0, height_imageIn), finalMatrix);
       //round
-      x0 = roundPoint(x0);
-      x1 = roundPoint(x1);
-      x2 = roundPoint(x2);
-      x3 = roundPoint(x3);
+      // x0 = roundPoint(x0);
+      // x1 = roundPoint(x1);
+      // x2 = roundPoint(x2);
+      // x3 = roundPoint(x3);
       let minMax = new MinMaxVector2();
       minMax.addValue(x0);
       minMax.addValue(x1);
       minMax.addValue(x2);
       minMax.addValue(x3);
 
+      console.log(minMax.minPos);
       let translateCorrection = matrixTranslate(new Vector2(- minMax.minPos.x, - minMax.minPos.y));
+      console.log(translateCorrection);
       finalMatrix = Matrix.mult(translateCorrection, finalMatrix);
       invertMatrix = Matrix.invert(finalMatrix);
-      x0 = linearTransformationPoint(x0, translateCorrection);
-      x1 = linearTransformationPoint(x1, translateCorrection);
-      x2 = linearTransformationPoint(x2, translateCorrection);
-      x3 = linearTransformationPoint(x3, translateCorrection);
+      // x0 = linearTransformationPoint(x0, translateCorrection);
+      // x1 = linearTransformationPoint(x1, translateCorrection);
+      // x2 = linearTransformationPoint(x2, translateCorrection);
+      // x3 = linearTransformationPoint(x3, translateCorrection);
+      x0 = linearTransformationPoint(new Point(0,0), finalMatrix);
+      x1 = linearTransformationPoint(new Point(width_imageIn, 0), finalMatrix);
+      x2 = linearTransformationPoint(new Point(width_imageIn, height_imageIn), finalMatrix);
+      x3 = linearTransformationPoint(new Point(0, height_imageIn), finalMatrix)
 
       h = minMax.maxPos.y - minMax.minPos.y;
       w = minMax.maxPos.x - minMax.minPos.x;
@@ -92,6 +97,7 @@ function DrawOutContext(debug = false) {
         outKeyPoints[i] = linearTransformationPoint(keyPoints[i], finalMatrix);
       }
     }
+    console.log(invertMatrix);
     setContextSize(ctxOut, w, h);
     switch(USER_DATAS.interporlationType){
       case "NearestNeighbor" :
@@ -166,10 +172,15 @@ function NearestNeighbor(ctx, imgData, polygon, invertMatrix) {
       }
       //position exacte du point après transformation inverse
       let floatingPos = linearTransformationPoint(Point(x, y), invertMatrix);
+      if(x == 0 && y ==  0 || x == w_out - 1 && y == h_out - 1) console.log(floatingPos);
       //position arrondi "au plus proche" après transformation inverse
-      let roundedPos = Math.round(floatingPos.x) * 4 + Math.round(floatingPos.y) * w * 4;
+      let roundedPos = Math.round(floatingPos.x - 0.0001) * 4 + Math.round(floatingPos.y - 0.0001) * w * 4;
+
       for (let i = 0; i < 4; i++) {
         newImgData.data[newPos + i] = imgData.data[roundedPos + i];
+        if(x == 0 && y ==  0 || x == w_out - 1 && y == h_out - 1){
+          console.log(roundedPos + i, imgData.data[roundedPos + i]);
+        }
       }
     }
   }
