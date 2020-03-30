@@ -177,8 +177,8 @@ function NearestNeighbor(ctx, imgData, polygon, invertMatrix) {
       let floatingPos = linearTransformationPoint(Point(x, y), invertMatrix);
       if(x == 0 && y ==  0 ) console.log("floatingPos 0,0 : ",floatingPos);
       if( x == w_out - 1 && y == h_out - 1)console.log("floatingPos w-1,h-1 : ",floatingPos);
-      //position arrondi "au plus proche" après transformation inverse
-      let roundedPos = { x: Math.floor(floatingPos.x), y: Math.floor(floatingPos.y)} ;
+      //position arrondi après transformation inverse
+      let roundedPos = new Point( Math.round(floatingPos.x), Math.round(floatingPos.y)) ;
       if(x == 0 && y ==  0 ) console.log("roundedPos 0,0 : ",roundedPos);
       if( x == w_out - 1 && y == h_out - 1)console.log("roundedPos w-1,h-1 : ",roundedPos);
 

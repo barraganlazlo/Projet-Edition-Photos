@@ -40,6 +40,9 @@ let USER_DATAS = {
  */
 const inputImageIn = document.getElementById("ImageIn");
 const btnImageIn = document.getElementById("btnImageIn");
+/**
+ * Download button
+ */
 const btnImageSave = document.getElementById("btnImageSave");
 
 const checkGlobal = document.getElementById("checkGlobal");
@@ -48,6 +51,8 @@ const rotationValue = document.getElementById("rotationValue");
 
 const translationX = document.getElementById("translationX");
 const translationY = document.getElementById("translationY");
+
+let tmpNameFile = "";
 
 function filterChange(radio) {
   USER_DATAS.interporlationType = radio.value;
@@ -86,11 +91,17 @@ inputImageIn.addEventListener("change", () => {
   console.log("upload image ");
   console.log(inputImageIn.files[0]);
   USER_DATAS.ImageIn = loadImage(URL.createObjectURL(inputImageIn.files[0]));
+  tmpNameFile = inputImageIn.files[0].name;
+  tmpNameFile = tmpNameFile.split(".");
+  tmpNameFile.pop();
+  tmpNameFile = tmpNameFile.join(".");
+  console.log(tmpNameFile);
 })
 
 btnImageSave.addEventListener("click", () => {
   let link = document.createElement('a');
-  link.download = 'image.png';
+  console.log(tmpNameFile);
+  link.download = tmpNameFile + '_transform.png';
   link.href = canvasOut.toDataURL();
   link.click();
 });
