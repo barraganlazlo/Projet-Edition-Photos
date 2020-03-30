@@ -40,6 +40,7 @@ let USER_DATAS = {
  */
 const inputImageIn = document.getElementById("ImageIn");
 const btnImageIn = document.getElementById("btnImageIn");
+const btnImageSave = document.getElementById("btnImageSave");
 
 const checkGlobal = document.getElementById("checkGlobal");
 const scaleValue = document.getElementById("scaleValue");
@@ -86,3 +87,10 @@ inputImageIn.addEventListener("change", () => {
   console.log(inputImageIn.files[0]);
   USER_DATAS.ImageIn = loadImage(URL.createObjectURL(inputImageIn.files[0]));
 })
+
+btnImageSave.addEventListener("click", () => {
+  let link = document.createElement('a');
+  link.download = 'image.png';
+  link.href = canvasOut.toDataURL();
+  link.click();
+});
