@@ -108,7 +108,7 @@ function DrawOutContext(debug = false) {
         ImageOutData = Bilinear(ctxOut, ImageInData, outKeyPoints, invertMatrix);
         break;
       case "Bicubic" :
-        ImageOutData = Test(ctxOut, ImageInData, outKeyPoints, invertMatrix);
+        ImageOutData = Bicubic(ctxOut, ImageInData, outKeyPoints, invertMatrix);
         break;
     }
     drawDefaultBackground(ctxOut);
@@ -276,76 +276,76 @@ function Bicubic(ctx, imgData, polygon, invertMatrix) {
       //position du pixel courrant dans newImgData
       let newPos = x * 4 + y * w_out * 4;
 
-      if (!insidePolygon(Point(x, y), polygon)) {
+      if (!insidePolygon(Point(x, y), polygon) && !USER_DATAS.global ) {
         for (let i = 0; i < 4; i++) {
-          newImgData.data[newPos + i] = 255;
+          if(USER_DATAS.global) newImgData.data[newPos + i] = 255;
+          else newImgData.data[newPos + i] = imgData.data[newPos + i];
         }
         continue;
       }
       //position exacte du point après transformation inverse
       let floatingPos = linearTransformationPoint(Point(x, y), invertMatrix);
-      //position arrondi "au plus proche" après transformation inverse
-      let i = Math.floor(floatingPos.x);
-      let j = Math.floor(floatingPos.y);
-      let t = floatingPos.x - i; //Horizontal Distance with i
-      let u = floatingPos.y - j; //Vertical Distance with j
-      //Loop for RGBA
+
+      // 1. On calcule les 16 voisins
+      let pos = new Point(Math.floor(floatingPos.x), Math.floor(floatingPos.y));
+
+      const Neighbor = [];
+
+      for(let i = 0; i < 4; i++ ){
+        Neighbor[i] = [];
+        for(let j = 0; j < 4; j++ ){
+          const p = new Point(pos.x -1  + i,pos.y -1 + j);
+          //On merge les valeurs en dehors de la taille de l'image
+          if(p.x <0){ p.x = 0; }
+          if(p.y <0){ p.y = 0; }
+          if(p.x>=w){ p.x=w-1; }
+          if(p.y>=h){ p.y=h-1; }
+          Neighbor[i][j]=p;
+        }
+      }
+
+      // Pour chaques valeurs de RGBA
       for (let k = 0; k < 4; k++) {
-        let va = (1 - u) * imgData.data[(j*w + i)*4 + k] + u * imgData.data[((j+1)*w + i)*4 + k];
-        let vb = (1 - u) * imgData.data[(j*w + i+1)*4 + k] + u * imgData.data[((j+1)*w + i+1)*4 + k ];
-        newImgData.data[newPos + k] = (1-t) * va + t *vb;
+
+        // 2. On calcule les 4 courbes cubiques
+        let curves = [];
+        for(let i=0;i<4;i++){
+          let p1= new Point(pos.y - 1, imgData.data[4*Neighbor[i][0].x + 4*Neighbor[i][0].y *w +k]);
+          let p2= new Point(pos.y - 0, imgData.data[4*Neighbor[i][1].x + 4*Neighbor[i][1].y *w +k]);
+          let p3= new Point(pos.y + 1, imgData.data[4*Neighbor[i][2].x + 4*Neighbor[i][2].y *w +k]);
+          let p4= new Point(pos.y + 2, imgData.data[4*Neighbor[i][3].x + 4*Neighbor[i][3].y *w +k]);
+          curves[i]=cubic(p1,p2,p3,p4);
+        }
+        // 3. On calcule la nouvelle courbe cubique associé aux 4 points des courbes précédentes données par la valeur du floatingPos en y
+        let final_curve= cubic(new Point(pos.x - 1, curves[0](floatingPos.y)),new Point(pos.x + 0, curves[1](floatingPos.y)),new Point(pos.x + 1, curves[2](floatingPos.y)),new Point(pos.x + 2, curves[3](floatingPos.y)));
+        // 4. On obtient la valeur voulue en appliquant la valeur du floatingPos en x à la dernière courbe cubique
+        newImgData.data[newPos + k] = final_curve(floatingPos.x);
       }
     }
   }
 
   return newImgData;
 }
-
 
 /**
-*
-* @param {Context} ctx le context dans lequel on crée la nouvelle image
-* @param {ImageData} imgData l'image data de l'image d'origine
-* @param {Polygon} polygon le polygone transformé
-* @param {Matrix} invertMatrix la matrice inverce de la transformation qu'à reçu le polygone
-*
-* @returns {ImageData} la nouvelle image data
-*/
-function Test(ctx, imgData, polygon, invertMatrix) {
-  let w = imgData.width;
-  let h = imgData.height;
-  let w_out = ctx.canvas.width;
-  let h_out = ctx.canvas.height;
-  let newImgData = ctx.createImageData(w_out, h_out);
+ * Permet de calculer une fonction cubique grâce à 4 points
+ * @param {Point} p1 le point numéro 1
+ * @param {Point} p2 le point numéro 2
+ * @param {Point} p3 le point numéro 3
+ * @param {Point} p4 le point numéro 4
+ * @returns {function} la fonction cubic généré grâce aux 4 points
+ */
+function cubic(p1, p2, p3, p4){
+  return (x) => {
+    const mult1 = (x) => (x - p2.x) * (x - p3.x) * (x - p4.x);
+    const mult2 = (x) => (x - p1.x) * (x - p3.x) * (x - p4.x);
+    const mult3 = (x) => (x - p1.x) * (x - p2.x) * (x - p4.x);
+    const mult4 = (x) => (x - p1.x) * (x - p2.x) * (x - p3.x);
 
-  for (let y = 0; y < h_out; y++) {
-    for (let x = 0; x < w_out; x++) {
-      //position du pixel courrant dans newImgData
-      let newPos = x * 4 + y * w_out * 4;
-
-      if (!insidePolygon(Point(x, y), polygon)) {
-        for (let i = 0; i < 4; i++) {
-          newImgData.data[newPos + i] = 255;
-        }
-        continue;
-      }
-      //position exacte du point après transformation inverse
-      let floatingPos = linearTransformationPoint(Point(x, y), invertMatrix);
-      //position arrondi "au plus proche" après transformation inverse
-      let i = Math.floor(floatingPos.x);
-      let j = Math.floor(floatingPos.y);
-
-
-      //Loop for RGBA
-      for (let k = 0; k < 4; k++) {
-
-        newImgData.data[newPos + k] = 255;
-      }
-    }
+    return (mult1(x) * (p1.y / mult1(p1.x))) + (mult2(x) * (p2.y / mult2(p2.x))) + (mult3(x) * (p3.y / mult3(p3.x))) + (mult4(x) * (p4.y / mult4(p4.x)));
   }
-
-  return newImgData;
 }
+
 
 
 
