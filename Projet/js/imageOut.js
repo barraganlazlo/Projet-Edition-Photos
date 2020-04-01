@@ -129,7 +129,7 @@ function DrawOutContext(debug = false) {
 * Draw canvas' out context
 * @param {Boolean} debug draw polygon points
 */
-function getDataOut() {
+function getDataOut(ctx) {
   let ImageOutData;
   //Draw Image
   if (USER_DATAS.ImageIn) {
@@ -141,7 +141,7 @@ function getDataOut() {
     outKeyPoints = [];
     let newCenter;
 
-    ImageInData = getImageData(ctxOut, USER_DATAS.ImageIn, false);
+    ImageInData = getImageData(ctx, USER_DATAS.ImageIn, false);
     w = ImageInData.width;
     h = ImageInData.height;
 
@@ -157,16 +157,16 @@ function getDataOut() {
     }
 
     // console.log("invertMatrix", invertMatrix);
-    //setContextSize(ctxOut, w, h);
+    //setContextSize(ctx, w, h);
     switch(USER_DATAS.interporlationType){
       case "NearestNeighbor" :
-        ImageOutData = NearestNeighbor(ctxOut, ImageInData, outKeyPoints, invertMatrix);
+        ImageOutData = NearestNeighbor(ctx, ImageInData, outKeyPoints, invertMatrix);
         break;
       case "Bilinear" :
-        ImageOutData = Bilinear(ctxOut, ImageInData, outKeyPoints, invertMatrix);
+        ImageOutData = Bilinear(ctx, ImageInData, outKeyPoints, invertMatrix);
         break;
       case "Bicubic" :
-        ImageOutData = Bicubic(ctxOut, ImageInData, outKeyPoints, invertMatrix);
+        ImageOutData = Bicubic(ctx, ImageInData, outKeyPoints, invertMatrix);
         break;
     }
   }

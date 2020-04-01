@@ -6,7 +6,7 @@ Promise.all([
   faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
   faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
   faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
-  faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+  // faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
 ])
 .then(startFaceDetection)
 .catch((e) => {
@@ -57,13 +57,18 @@ function startFaceDetection(){
   canvas.id = "canvasOut";
   // canvas.className = "-f-mult1"
   canvas.className = "-align-scenter";
-  video.style.display = "none";
-  const ctx = canvas.getContext("2d");
-  ctxOut = ctx;
+  //video.style.display = "none";
+  const ctxOut = canvas.getContext("2d");
   document.body.append(canvas);
   const displaySize = {width: video.width, height : video.height};
   faceapi.matchDimensions(canvas, displaySize);
   // canvas.style.width = "100%";
+
+
+  let canvasDraw=document.createElement("canvas");
+  let ctxDraw=canvasDraw.getContext("2d");
+  canvasDraw.width=video.width;
+  canvasDraw.height=video.height;
 
   let echec = 0;
 
@@ -75,7 +80,10 @@ function startFaceDetection(){
     const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
     const resizedDetections = faceapi.resizeResults(detections, displaySize);
 
-    ctxOut.drawImage(video, 0, 0); //Draw default image
+    ctxDraw.drawImage(video, 0, 0); //Draw default image temporaly
+    ctxOut.clearRect(0, 0, ctxOut.width, ctxOut.height);
+
+    console.log(detections);
 
     if(echec > 20){
       keyPoints = [];
@@ -88,37 +96,23 @@ function startFaceDetection(){
 
       //Get image mouth
 
-      let mouthData = getDataOut();
+      let mouthData = getDataOut(ctxDraw);
       // console.log(mouthData);
-      let w = mouthData.width;
-      let h = mouthData.height;
-
-      let canvas2=document.createElement("canvas");
-      canvas2.width=w;
-      canvas2.height=h
-      let ctx2=canvas2.getContext("2d");
-      ctx2.putImageData(mouthData,0,0);
-      ctxOut.drawImage(canvas2, 0, 0);
-
-      canvas2.remove();
+      ctxDraw.putImageData(mouthData,0,0);
+      ctxOut.drawImage(canvasDraw, 0, 0);
     }
     if(detections.length <= 0){
       echec++;
       if(keyPoints.length != 0){
 
-      let mouthData = getDataOut();
-      // console.log(mouthData);
-      let w = mouthData.width;
-      let h = mouthData.height;
+      let mouthData = getDataOut(ctxDraw);
 
-      let canvas2=document.createElement("canvas");
-      canvas2.width=w;
-      canvas2.height=h
-      let ctx2=canvas2.getContext("2d");
-      ctx2.putImageData(mouthData,0,0);
-      ctxOut.drawImage(canvas2, 0, 0);
+      let canvasDraw=document.createElement("canvas");
 
-      canvas2.remove();
+      ctxDraw.putImageData(mouthData,0,0);
+      ctxOut.drawImage(canvasDraw, 0, 0);
+
+      canvasDraw.remove();
       }
     }
 
