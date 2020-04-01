@@ -21,8 +21,8 @@ function startVideo(){
   logError(navigator.mediaDevices);
   navigator.mediaDevices.getUserMedia({
       video: {
-        width: {max : 720},
-        height: {max : 1280}
+        width: {max : 1280},
+        height: {max : 720}
       }
     }
   ).then((stream) => {
@@ -53,7 +53,7 @@ function startFaceDetection(){
   const ctx = canvas.getContext("2d");
   ctxOut = ctx;
   document.body.append(canvas);
-  const displaySize = {width: 720, height : 1280};
+  const displaySize = {width: 1280, height : 720};
   faceapi.matchDimensions(canvas, displaySize);
 
   let echec = 0;
