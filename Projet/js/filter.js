@@ -21,8 +21,9 @@ function startVideo(){
   logError(navigator.mediaDevices);
   navigator.mediaDevices.getUserMedia({
       video: {
-        width: {max : 1280},
-        height: {max : 720}
+        width: {ideal: 1280},
+        height: {ideal: 720},
+        facingMode: "user",
       }
     }
   ).then((stream) => {
