@@ -60,7 +60,7 @@ function startFaceDetection(){
   canvas.id = "canvasOut";
   // canvas.className = "-f-mult1"
   canvas.className = "-align-scenter";
-  canvas.style.background = "aliceblue";
+  // canvas.style.background = "aliceblue";
   //video.style.display = "none";
   const ctxOut = canvas.getContext("2d");
   document.body.append(canvas);
