@@ -56,7 +56,6 @@ function endPerformance(){ return performance.now() - perf; }
 
 function startFaceDetection(){
   if(video.paused) return setTimeout(startFaceDetection);
-  logError('');
   const canvas = faceapi.createCanvasFromMedia(video);
   canvas.id = "canvasOut";
   // canvas.className = "-f-mult1"
@@ -68,6 +67,8 @@ function startFaceDetection(){
   const displaySize = {width: video.width, height : video.height};
   faceapi.matchDimensions(canvas, displaySize);
   // canvas.style.width = "100%";
+  logError(video.width + " : " + video.height + " / " + canvas.width + " : " + canvas.height);
+  return;
 
 
   let canvasDraw=document.createElement("canvas");
