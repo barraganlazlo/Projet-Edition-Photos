@@ -27,7 +27,6 @@ function startVideo(){
       }
     }
   ).then((stream) => {
-    logError('YES LE STREAM');
     video.srcObject = stream;
   }).catch(logError);
 }
@@ -46,6 +45,7 @@ function logError(err){
 
 function startFaceDetection(){
   if(video.paused) return setTimeout(startFaceDetection);
+  logError('');
   const canvas = faceapi.createCanvasFromMedia(video);
   canvas.id = "canvasOut";
   // canvas.className = "-f-mult1"
@@ -57,7 +57,7 @@ function startFaceDetection(){
   const rect = canvas.getBoundingClientRect();
   const displaySize = {width: rect.width, height : rect.height};
   faceapi.matchDimensions(canvas, displaySize);
-  canvas.className = "-f-mult1";
+  canvas.style.width = "100%";
 
   let echec = 0;
 
