@@ -45,17 +45,19 @@ function logError(err){
 
 
 function startFaceDetection(){
-  return;
   if(video.paused) return setTimeout(startFaceDetection);
   const canvas = faceapi.createCanvasFromMedia(video);
   canvas.id = "canvasOut";
-  canvas.className = "-f-mult1"
+  // canvas.className = "-f-mult1"
+  canvas.className = "-align-scenter";
   video.style.display = "none";
   const ctx = canvas.getContext("2d");
   ctxOut = ctx;
   document.body.append(canvas);
-  const displaySize = {width: 1280, height : 720};
+  const rect = canvas.getBoundingClientRect();
+  const displaySize = {width: rect.width, height : rect.height};
   faceapi.matchDimensions(canvas, displaySize);
+  canvas.className = "-f-mult1";
 
   let echec = 0;
 
