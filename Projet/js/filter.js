@@ -70,8 +70,8 @@ function startFaceDetection(){
   logError(video.width + " : " + video.height + " / " + canvas.width + " : " + canvas.height);
   video.style.width = video.width + "px";
   video.style.height = video.height + "px";
-  canvas.style.width = canvas.width + "px";
-  canvas.style.height = canvas.height + "px";
+  canvas.style.width = video.width + "px";
+  canvas.style.height = video.height + "px";
   return;
 
 
