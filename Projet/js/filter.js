@@ -23,8 +23,6 @@ function startVideo(){
   );
 }
 
-startVideo();
-
 video.addEventListener('play', () => {
   startFaceDetection();
 })
@@ -59,7 +57,7 @@ function startFaceDetection(){
 
     USER_DATAS.ImageIn = video;
     USER_DATAS.interporlationType = "Bilinear";
-    const detections = await faceapi.detectAllFaces(video, new faceapi.SsdMobilenetv1Options()).withFaceLandmarks();
+    const detections = await faceapi.detectAllFaces(video, new faceapi.tinyFaceDetectorOptions()).withFaceLandmarks();
     const resizedDetections = faceapi.resizeResults(detections, displaySize);
 
     ctxOut.drawImage(video, 0, 0); //Draw default image
