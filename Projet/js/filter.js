@@ -14,10 +14,11 @@ Promise.all([
 })
 
 const video = document.getElementById("video");
+const log = document.getElementById('ERROR');
 
 function startVideo(){
   const rect = document.body.getBoundingClientRect();
-  console.log(rect);
+  logError(navigator.mediaDevices);
   navigator.mediaDevices.getUserMedia({
       video: {
         width: {max : rect.width + 1},
@@ -25,13 +26,12 @@ function startVideo(){
       }
     }
   ).then((stream) => {
+    logError('YES LE STREAM');
     video.srcObject = stream;
-  }).catch(logError)
+  }).catch(logError);
 }
 
 startVideo();
-
-const log = document.getElementById('ERROR');
 
 window.onerror = function (msg, url, line) {
    logError(msg + " -- " + line);
