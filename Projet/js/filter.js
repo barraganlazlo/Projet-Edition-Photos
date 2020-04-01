@@ -52,7 +52,7 @@ function startFaceDetection(){
   const ctx = canvas.getContext("2d");
   ctxOut = ctx;
   document.body.append(canvas);
-  const rect = document.body.getBoundingClientRect();
+  const rect = video.getBoundingClientRect();
   const displaySize = {width: rect.width, height : rect.height};
   faceapi.matchDimensions(canvas, displaySize);
 
