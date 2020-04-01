@@ -93,15 +93,15 @@ function startFaceDetection(){
     let scaleToCover = Math.max(scaleX, scaleY);
 
     canvas.style.transformOrigin = "0 0"; //scale from top left
-    canvas.style.transform = " translateX("+ (windowSize.width / 2 + canvas.width * scaleToFit / 2) +"px) scale( -" + scaleToFit + ", " + scaleToFit + ")";
+    canvas.style.transform = " translateX("+ (windowSize.width / 2 + canvas.width * scaleToCover / 2) +"px) scale( -" + scaleToCover + ", " + scaleToCover + ")";
     canvas.style.position = "fixed";
-    canvas.style.top = (windowSize.height / 2 - (canvas.height / 2) * scaleToFit) + "px";
+    canvas.style.top = (windowSize.height / 2 - (canvas.height / 2) * scaleToCover) + "px";
     canvas.style.left = 0;
 
     video.style.transformOrigin = "0 0"; //scale from top left
-    video.style.transform = " translateX("+ (windowSize.width / 2 + canvas.width * scaleToFit / 2) +"px) scale( -" + scaleToFit + ", " + scaleToFit + ")";
+    video.style.transform = " translateX("+ (windowSize.width / 2 + canvas.width * scaleToCover / 2) +"px) scale( -" + scaleToCover + ", " + scaleToCover + ")";
     video.style.position = "fixed";
-    video.style.top = (windowSize.height / 2 - (canvas.height / 2) * scaleToFit) + "px";
+    video.style.top = (windowSize.height / 2 - (canvas.height / 2) * scaleToCover) + "px";
     video.style.left = 0;
 
 
@@ -146,11 +146,8 @@ function startFaceDetection(){
     /* End  performances */ let speedEffect = endPerformance();
 
     faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
-    moyenneFace += speedFace * 100;
-    moyenneDraw += speedDraw * 100;
-    moyenneEffect += speedEffect * 100;
 
-    logError(++tick + " : " + (speedFace / tick).toFixed(2) + " / " + (speedDraw / tick).toFixed(2) + " / " + (speedEffect / tick).toFixed(2));
+    logError(++tick + " : " + (speedFace).toFixed(2) + " / " + (speedDraw).toFixed(2) + " / " + (speedEffect).toFixed(2) + " ----- " + scaleX + " / " + scaleY + " / " + scaleToFit);
 
     loopFilter();
   }
