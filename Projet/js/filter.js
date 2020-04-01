@@ -6,6 +6,7 @@ Promise.all([
   faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
   faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
   faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
+  faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
 ])
 .then(startFaceDetection)
 .catch((e) => {
@@ -14,9 +15,22 @@ Promise.all([
 
 const video = document.getElementById("video");
 
+function startVideo(){
+  navigator.getUserMedia(
+    { video : {} },
+    stream => video.srcObject = stream,
+    err => console.log(err),
+  );
+}
+
+startVideo();
+
+
 function startFaceDetection(){
   const canvas = faceapi.createCanvasFromMedia(video);
   canvas.id = "canvasOut";
+  canvas.className = "-f-mult1"
+  video.style.display = "none";
   const ctx = canvas.getContext("2d");
   ctxOut = ctx;
   document.body.append(canvas);
@@ -60,9 +74,27 @@ function startFaceDetection(){
 
       canvas2.remove();
     }
-    if(detections.length <= 0){ echec++; }
+    if(detections.length <= 0){
+      echec++;
+      if(keyPoints.length != 0){
 
-    faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+      let mouthData = getDataOut();
+      // console.log(mouthData);
+      let w = mouthData.width;
+      let h = mouthData.height;
+
+      let canvas2=document.createElement("canvas");
+      canvas2.width=w;
+      canvas2.height=h
+      let ctx2=canvas2.getContext("2d");
+      ctx2.putImageData(mouthData,0,0);
+      ctxOut.drawImage(canvas2, 0, 0);
+
+      canvas2.remove();
+      }
+    }
+
+    // faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
 
     loopFilter();
   }
@@ -72,14 +104,13 @@ function startFaceDetection(){
 
 function calculateMouthPolygon(landmarks){
   const dist = distance(new Point(landmarks.positions[66]._x, landmarks.positions[66]._y), new Point(landmarks.positions[62]._x, landmarks.positions[62]._y)) / 20;
-  USER_DATAS.scale = 1.2 + (dist * dist);
+  let scale = 1.2 + (dist * dist);
+  USER_DATAS.scale = scale > 2 ? 2 : scale;
   let tempKeysPoints = [];
-  let minMax = new MinMaxVector2();
 
   for (let i = 48; i < 60; i++) {
     const p = new Point(landmarks.positions[i]._x, landmarks.positions[i]._y);
     tempKeysPoints.push(p);
-    minMax.addValue(p)
   }
   keyPoints = tempKeysPoints;
   computeCenter();
