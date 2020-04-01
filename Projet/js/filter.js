@@ -30,10 +30,6 @@ function startVideo(){
 
 startVideo();
 
-video.addEventListener('play', () => {
-  startFaceDetection();
-})
-
 const log = document.getElementById('ERROR');
 
 window.onerror = function (msg, url, line) {
@@ -47,6 +43,7 @@ function logError(err){
 
 
 function startFaceDetection(){
+  if(video.paused) return setTimeout(startFaceDetection);
   const canvas = faceapi.createCanvasFromMedia(video);
   canvas.id = "canvasOut";
   canvas.className = "-f-mult1"
