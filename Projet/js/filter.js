@@ -3,7 +3,7 @@ let STOP_FILTER = false;
 
 Promise.all([
   faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-  faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+  faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL),
   // faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
   // faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
   // faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
