@@ -44,6 +44,7 @@ function logError(err){
 
 
 function startFaceDetection(){
+  return;
   if(video.paused) return setTimeout(startFaceDetection);
   const canvas = faceapi.createCanvasFromMedia(video);
   canvas.id = "canvasOut";
