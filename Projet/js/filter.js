@@ -21,8 +21,8 @@ function startVideo(){
   logError(navigator.mediaDevices);
   navigator.mediaDevices.getUserMedia({
       video: {
-        width: {ideal: 480},
-        height: {ideal: 320},
+        width: {ideal: 320, max: 720},
+        height: {ideal: 240, max: 480},
         facingMode: "user",
       }
     }
@@ -127,7 +127,7 @@ function startFaceDetection(){
 function calculateMouthPolygon(landmarks){
   const dist = distance(new Point(landmarks.positions[66]._x, landmarks.positions[66]._y), new Point(landmarks.positions[62]._x, landmarks.positions[62]._y)) / 20;
   let scale = 1.2 + (dist * dist);
-  USER_DATAS.scale = scale > 2 ? 2 : scale;
+  USER_DATAS.scale = scale > 3 ? 3 : scale;
   let tempKeysPoints = [];
 
   for (let i = 48; i < 60; i++) {
