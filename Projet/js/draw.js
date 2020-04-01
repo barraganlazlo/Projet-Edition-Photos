@@ -49,3 +49,16 @@ function drawCross(point, ctx) {
   ctx.lineTo(point.x + sizeCross, point.y);
   ctx.stroke();
 }
+
+function realContextSize(ctx) {
+  ctx.canvas.width = ctx.canvas.offsetWidth;
+  ctx.canvas.height = ctx.canvas.offsetHeight;
+}
+
+function drawDefaultBackground(ctx) {
+  realContextSize(ctx);
+  let w = ctx.canvas.width;
+  let h = ctx.canvas.height;
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, w, h);
+}

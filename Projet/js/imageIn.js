@@ -12,13 +12,7 @@ let ctxIn = canvasIn.getContext('2d');
 realContextSize(ctxIn);
 
 
-/**
-* Key Points
-* Represent the strategics points to scale localy the image
-*/
-let keyPoints = []; //strategics points
-let center = Point(0, 0);
-let pointSize = 4;
+
 let pointSelected = -1; //Point not defined
 let nearPoint = -1; //Point not defined
 
@@ -35,16 +29,6 @@ function getNearKeyPoint() {
 function addKeyPoint(point) {
   keyPoints.push(point);
   computeCenter();
-}
-
-function computeCenter() {
-  center = Point(0, 0);
-  for (let i = 0; i < keyPoints.length; i++) {
-    center.x += keyPoints[i].x;
-    center.y += keyPoints[i].y;
-  }
-  center.x /= keyPoints.length;
-  center.y /= keyPoints.length;
 }
 
 /**
@@ -64,19 +48,6 @@ function DrawInContext(debug = true) {
     drawCross(center, ctxIn);
   }
   DrawOutContext();
-}
-
-function realContextSize(ctx) {
-  ctx.canvas.width = ctx.canvas.offsetWidth;
-  ctx.canvas.height = ctx.canvas.offsetHeight;
-}
-
-function drawDefaultBackground(ctx) {
-  realContextSize(ctx);
-  let w = ctx.canvas.width;
-  let h = ctx.canvas.height;
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(0, 0, w, h);
 }
 
 

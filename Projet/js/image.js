@@ -9,9 +9,9 @@ function loadImage(src) {
   return img;
 }
 
-function getImageData(ctx, img) {
+function getImageData(ctx, img, draw = true) {
   let w = img.width;
   let h = img.height;
-  drawImage(ctx, img);
+  if(draw) drawImage(ctx, img);
   return ctx.getImageData(0, 0, w, h);
 }
