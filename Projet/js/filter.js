@@ -70,22 +70,24 @@ function startFaceDetection(){
   canvasDraw.width=video.width;
   canvasDraw.height=video.height;
 
-  let scaleX = window.innerWidth / canvas.width;
-  let scaleY = window.innerHeight / canvas.height;
+  const windowSize = document.body.getBoundingClientRect();
+
+  let scaleX = windowSize.width / canvas.width;
+  let scaleY = windowSize.height / canvas.height;
 
   let scaleToFit = Math.min(scaleX, scaleY);
   let scaleToCover = Math.max(scaleX, scaleY);
 
   canvas.style.transformOrigin = "0 0"; //scale from top left
-  canvas.style.transform = " translateX("+ (window.innerWidth / 2 + canvas.width * scaleToFit / 2) +"px) scale( -" + scaleToFit + ", " + scaleToFit + ")";
+  canvas.style.transform = " translateX("+ (windowSize.width / 2 + canvas.width * scaleToFit / 2) +"px) scale( -" + scaleToFit + ", " + scaleToFit + ")";
   canvas.style.position = "fixed";
-  canvas.style.top = (window.innerHeight / 2 - (canvas.height / 2) * scaleToFit) + "px";
+  canvas.style.top = (windowSize.height / 2 - (canvas.height / 2) * scaleToFit) + "px";
   canvas.style.left = 0;
 
   video.style.transformOrigin = "0 0"; //scale from top left
-  video.style.transform = " translateX("+ (window.innerWidth / 2 + canvas.width * scaleToFit / 2) +"px) scale( -" + scaleToFit + ", " + scaleToFit + ")";
+  video.style.transform = " translateX("+ (windowSize.width / 2 + canvas.width * scaleToFit / 2) +"px) scale( -" + scaleToFit + ", " + scaleToFit + ")";
   video.style.position = "fixed";
-  video.style.top = (window.innerHeight / 2 - (canvas.height / 2) * scaleToFit) + "px";
+  video.style.top = (windowSize.height / 2 - (canvas.height / 2) * scaleToFit) + "px";
   video.style.left = 0;
 
   let echec = 0;
