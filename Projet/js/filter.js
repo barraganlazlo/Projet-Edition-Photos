@@ -57,7 +57,7 @@ function startFaceDetection(){
   const rect = canvas.getBoundingClientRect();
   const displaySize = {width: rect.width, height : rect.height};
   faceapi.matchDimensions(canvas, displaySize);
-  canvas.style.width = "100%";
+  // canvas.style.width = "100%";
 
   let echec = 0;
 
