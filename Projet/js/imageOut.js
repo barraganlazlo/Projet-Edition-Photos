@@ -286,15 +286,15 @@ function Bilinear(ctx, imgData, polygon, invertMatrix) {
         va=(1 - u) * imgData.data[(j*w + i)*4 + k];
         vb=va;
         if(j<h-1){
-          va=addFloat(va, u * imgData.data[((j+1)*w + i)*4 + k]);
+          va=(va + u * imgData.data[((j+1)*w + i)*4 + k]);
         }
         if(i<w-1){
           vb=(1 - u) * imgData.data[(j*w + i+1)*4 + k];
         }
         if(j<h-1 && i<w-1){
-          vb=addFloat(vb, u * imgData.data[((j+1)*w + i+1)*4 + k ]);
+          vb=(vb + u * imgData.data[((j+1)*w + i+1)*4 + k ]);
         }
-        newImgData.data[newPos + k] = addFloat( (1-t) * va, t *vb);
+        newImgData.data[newPos + k] = ( (1-t) * va +  t *vb);
       }
     }
   }

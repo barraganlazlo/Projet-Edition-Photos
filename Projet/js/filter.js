@@ -165,12 +165,15 @@ function calculateMouthPolygon(landmarks){
   const dist = distance(new Point(landmarks.positions[66]._x, landmarks.positions[66]._y), new Point(landmarks.positions[62]._x, landmarks.positions[62]._y)) / 20;
   let scale = 1.2 + (dist * dist);
   USER_DATAS.scale = scale > 3 ? 3 : scale;
-  let tempKeysPoints = [];
+  keyPoints = [];
+  center = new Point(0,0);
 
   for (let i = 48; i < 60; i++) {
     const p = new Point(landmarks.positions[i]._x, landmarks.positions[i]._y);
-    tempKeysPoints.push(p);
+    keyPoints[i - 48] = p;
+    center.x += p.x;
+    center.y += p.y;
   }
-  keyPoints = tempKeysPoints;
-  computeCenter();
+  center.x /= keyPoints.length;
+  center.y /= keyPoints.length;
 }
