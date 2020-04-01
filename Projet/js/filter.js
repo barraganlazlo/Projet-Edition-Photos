@@ -77,13 +77,13 @@ function startFaceDetection(){
   let scaleToCover = Math.max(scaleX, scaleY);
 
   canvas.style.transformOrigin = "0 0"; //scale from top left
-  canvas.style.transform = "scale( -" + scaleToFit + ", " + scaleToFit + ") translateX("+ (-canvas.width) +"px)";
+  canvas.style.transform = " translateX("+ (window.innerWidth / 2 + canvas.width * scaleToFit / 2) +"px) scale( -" + scaleToFit + ", " + scaleToFit + ")";
   canvas.style.position = "fixed";
   canvas.style.top = (window.innerHeight / 2 - (canvas.height / 2) * scaleToFit) + "px";
   canvas.style.left = 0;
 
   video.style.transformOrigin = "0 0"; //scale from top left
-  video.style.transform = "scale( -" + scaleToFit + ", " + scaleToFit + ") translateX("+ (-canvas.width) +"px)";
+  video.style.transform = " translateX("+ (window.innerWidth / 2 + canvas.width * scaleToFit / 2) +"px) scale( -" + scaleToFit + ", " + scaleToFit + ")";
   video.style.position = "fixed";
   video.style.top = (window.innerHeight / 2 - (canvas.height / 2) * scaleToFit) + "px";
   video.style.left = 0;
