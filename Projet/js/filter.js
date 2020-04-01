@@ -4,7 +4,7 @@ let STOP_FILTER = false;
 Promise.all([
   faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
   faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-  faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+  // faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
   // faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
   // faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
 ])
@@ -107,7 +107,7 @@ function startFaceDetection(){
     USER_DATAS.ImageIn = video;
     USER_DATAS.interporlationType = "Bilinear";
     /* Start performances */ startPerformance();
-    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({inputSize : 128})).withFaceLandmarks();
     const resizedDetections = faceapi.resizeResults(detections, displaySize);
     /* End  performances */ let speedFace = endPerformance();
 
