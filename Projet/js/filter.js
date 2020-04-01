@@ -16,10 +16,11 @@ Promise.all([
 const video = document.getElementById("video");
 
 function startVideo(){
+  const rect = video.getBoundingClientRect();
   navigator.mediaDevices.getUserMedia({
       video: {
-        width: { min: 720 },
-        height: { min: 1280 }
+        width: rect.width,
+        height: rect.height
       }
     }
   ).then((stream) => {
@@ -53,7 +54,8 @@ function startFaceDetection(){
   const ctx = canvas.getContext("2d");
   ctxOut = ctx;
   document.body.append(canvas);
-  const displaySize = {width: video.width, height : video.height};
+  const rect = video.getBoundingClientRect();
+  const displaySize = {width: rect.width, height : rect.height};
   faceapi.matchDimensions(canvas, displaySize);
 
   let echec = 0;
