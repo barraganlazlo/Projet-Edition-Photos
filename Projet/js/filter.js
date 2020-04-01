@@ -21,8 +21,8 @@ function startVideo(){
   logError(navigator.mediaDevices);
   navigator.mediaDevices.getUserMedia({
       video: {
-        width: {max : rect.width + 1},
-        height: {max : rect.height + 1}
+        width: {max : 720},
+        height: {max : 1280}
       }
     }
   ).then((stream) => {
