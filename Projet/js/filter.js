@@ -68,6 +68,10 @@ function startFaceDetection(){
   faceapi.matchDimensions(canvas, displaySize);
   // canvas.style.width = "100%";
   logError(video.width + " : " + video.height + " / " + canvas.width + " : " + canvas.height);
+  video.style.width = video.width + "px";
+  video.style.height = video.height + "px";
+  canvas.style.width = canvas.width + "px";
+  canvas.style.height = canvas.height + "px";
   return;
 
 
