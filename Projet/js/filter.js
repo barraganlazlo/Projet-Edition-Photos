@@ -8,7 +8,7 @@ Promise.all([
   faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
   faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
 ])
-.then(startVideo)
+.then(startFaceDetection)
 .catch((e) => {
   logError(e);
 })
@@ -16,12 +16,18 @@ Promise.all([
 const video = document.getElementById("video");
 
 function startVideo(){
-  navigator.getUserMedia(
-    { video : {} },
-    stream => video.srcObject = stream,
-    err => logError(err),
-  );
+  navigator.mediaDevices.getUserMedia({
+      video: {
+        width: { min: 720 },
+        height: { min: 1280 }
+      }
+    }
+  ).then((stream) => {
+    video.srcObject = stream;
+  }).catch(logError)
 }
+
+startVideo();
 
 video.addEventListener('play', () => {
   startFaceDetection();
