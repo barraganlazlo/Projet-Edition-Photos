@@ -114,7 +114,7 @@ function startFaceDetection(){
     USER_DATAS.ImageIn = video;
     USER_DATAS.interporlationType = "Bilinear";
     /* Start performances */ startPerformance();
-    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({inputSize : 128})).withFaceLandmarks(true);
+    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({inputSize : 64})).withFaceLandmarks(true);
     const resizedDetections = faceapi.resizeResults(detections, displaySize);
     /* End  performances */ let speedFace = endPerformance();
 
