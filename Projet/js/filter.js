@@ -10,6 +10,7 @@ Promise.all([
 ])
 .then(startVideo)
 .catch((e) => {
+  writeError(e);
   console.log(e);
 })
 
@@ -19,13 +20,18 @@ function startVideo(){
   navigator.getUserMedia(
     { video : {} },
     stream => video.srcObject = stream,
-    err => console.log(err),
+    err => writeError(err),
   );
 }
 
 video.addEventListener('play', () => {
   startFaceDetection();
 })
+
+function writeError(err){
+  const ERROR = document.getElementById("ERROR");
+  ERROR.innerHTML = err;
+}
 
 
 function startFaceDetection(){
