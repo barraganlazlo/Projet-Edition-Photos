@@ -67,12 +67,12 @@ function startFaceDetection(){
   const displaySize = {width: video.width, height : video.height};
   faceapi.matchDimensions(canvas, displaySize);
   // canvas.style.width = "100%";
-  logError(video.width + " : " + video.height + " / " + canvas.width + " : " + canvas.height);
-  video.style.width = video.width + "px";
-  video.style.height = video.height + "px";
-  canvas.style.width = video.width + "px";
-  canvas.style.height = video.height + "px";
-  return;
+
+  // logError(video.width + " : " + video.height + " / " + canvas.width + " : " + canvas.height);
+  // video.style.width = video.width + "px";
+  // video.style.height = video.height + "px";
+  // canvas.style.width = video.width + "px";
+  // canvas.style.height = video.height + "px";
 
 
   let canvasDraw=document.createElement("canvas");
@@ -90,25 +90,25 @@ function startFaceDetection(){
   let loopFilter = async () => {
     if(STOP_FILTER) return;
 
-    // const windowSize = document.body.getBoundingClientRect();
-    //
-    // let scaleX = windowSize.width / video.width;
-    // let scaleY = windowSize.height / video.height;
-    //
-    // let scaleToFit = Math.min(scaleX, scaleY);
-    // let scaleToCover = Math.max(scaleX, scaleY);
-    //
-    // canvas.style.transformOrigin = "0 0"; //scale from top left
-    // canvas.style.transform = " translateX("+ (windowSize.width / 2 + canvas.width * scaleToFit / 2) +"px) scale( -" + scaleToFit + ", " + scaleToFit + ")";
-    // canvas.style.position = "fixed";
-    // canvas.style.top = (windowSize.height / 2 - (canvas.height / 2) * scaleToFit) + "px";
-    // canvas.style.left = 0;
-    //
-    // video.style.transformOrigin = "0 0"; //scale from top left
-    // video.style.transform = " translateX("+ (windowSize.width / 2 + canvas.width * scaleToFit / 2) +"px) scale( -" + scaleToFit + ", " + scaleToFit + ")";
-    // video.style.position = "fixed";
-    // video.style.top = (windowSize.height / 2 - (canvas.height / 2) * scaleToFit) + "px";
-    // video.style.left = 0;
+    const windowSize = document.body.getBoundingClientRect();
+
+    let scaleX = windowSize.width / video.width;
+    let scaleY = windowSize.height / video.height;
+
+    let scaleToFit = Math.min(scaleX, scaleY);
+    let scaleToCover = Math.max(scaleX, scaleY);
+
+    canvas.style.transformOrigin = "0 0"; //scale from top left
+    canvas.style.transform = " translateX("+ (windowSize.width / 2 + canvas.width * scaleToFit / 2) +"px) scale( -" + scaleToFit + ", " + scaleToFit + ")";
+    canvas.style.position = "fixed";
+    canvas.style.top = (windowSize.height / 2 - (canvas.height / 2) * scaleToFit) + "px";
+    canvas.style.left = 0;
+
+    video.style.transformOrigin = "0 0"; //scale from top left
+    video.style.transform = " translateX("+ (windowSize.width / 2 + canvas.width * scaleToFit / 2) +"px) scale( -" + scaleToFit + ", " + scaleToFit + ")";
+    video.style.position = "fixed";
+    video.style.top = (windowSize.height / 2 - (canvas.height / 2) * scaleToFit) + "px";
+    video.style.left = 0;
 
 
     USER_DATAS.ImageIn = video;
