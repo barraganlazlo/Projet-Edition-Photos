@@ -5,7 +5,7 @@ Promise.all([
   faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
   faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
   faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
-  faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
+  // faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
   // faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
 ])
 .then(startFaceDetection)
@@ -47,6 +47,10 @@ window.onerror = function (msg, url, line) {
 function logError(err){
    log.innerText = err;
 }
+
+let perf = 0;
+function startPerformance(){ perf = performance.now(); };
+function endPerformance(){ return performance.now() - perf; }
 
 
 
@@ -91,50 +95,61 @@ function startFaceDetection(){
   video.style.left = 0;
 
   let echec = 0;
+  let tick = 0;
+
+  let moyenneFace = 0;
+  let moyenneDraw = 0;
+  let moyenneEffect = 0;
 
   let loopFilter = async () => {
     if(STOP_FILTER) return;
 
     USER_DATAS.ImageIn = video;
     USER_DATAS.interporlationType = "Bilinear";
+    /* Start performances */ startPerformance();
     const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
     const resizedDetections = faceapi.resizeResults(detections, displaySize);
+    /* End  performances */ let speedFace = endPerformance();
 
+    /* Start performances */ startPerformance();
     ctxDraw.drawImage(video, 0, 0); //Draw default image temporaly
     ctxOut.clearRect(0, 0, video.width, video.height);
+    /* End  performances */ let speedDraw = endPerformance();
 
-    if(echec > 20){
-      keyPoints = [];
-    }
-    for(let i = 0; i < detections.length; i++){
-      echec = 0; //Reset echec
-      let detection = detections[i];
-      const landmarks = detections[i].landmarks;
-      calculateMouthPolygon(landmarks);
+    /* Start performances */ startPerformance();
+    // if(echec > 20){
+    //   keyPoints = [];
+    // }
+    // for(let i = 0; i < detections.length; i++){
+    //   echec = 0; //Reset echec
+    //   let detection = detections[i];
+    //   const landmarks = detections[i].landmarks;
+    //   calculateMouthPolygon(landmarks);
+    //
+    //   //Get image mouth
+    //
+    //   let mouthData = getDataOut(ctxDraw);
+    //   // console.log(mouthData);
+    //   ctxDraw.putImageData(mouthData,0,0);
+    //   ctxOut.drawImage(canvasDraw, 0, 0);
+    // }
+    // if(detections.length <= 0){
+    //   echec++;
+    //   if(keyPoints.length != 0){
+    //     let mouthData = getDataOut(ctxDraw);
+    //
+    //     ctxDraw.putImageData(mouthData,0,0);
+    //     ctxOut.drawImage(canvasDraw, 0, 0);
+    //   }
+    // }
+    /* End  performances */ let speedEffect = endPerformance();
 
-      //Get image mouth
+    faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+    moyenneFace += speedFace * 100;
+    moyenneDraw += speedDraw * 100;
+    moyenneEffect += speedEffect * 100;
 
-      let mouthData = getDataOut(ctxDraw);
-      // console.log(mouthData);
-      ctxDraw.putImageData(mouthData,0,0);
-      ctxOut.drawImage(canvasDraw, 0, 0);
-    }
-    if(detections.length <= 0){
-      echec++;
-      if(keyPoints.length != 0){
-
-      let mouthData = getDataOut(ctxDraw);
-
-      let canvasDraw=document.createElement("canvas");
-
-      ctxDraw.putImageData(mouthData,0,0);
-      ctxOut.drawImage(canvasDraw, 0, 0);
-
-      canvasDraw.remove();
-      }
-    }
-
-    // faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+    logError(++tick + " : " + (speedFace / tick).toFixed(2) + " / " + (speedDraw / tick).toFixed(2) + " / " + (speedEffect / tick).toFixed(2));
 
     loopFilter();
   }
