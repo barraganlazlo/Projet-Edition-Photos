@@ -86,22 +86,22 @@ function startFaceDetection(){
 
     const windowSize = document.body.getBoundingClientRect();
 
-    let scaleX = windowSize.width / canvas.width;
-    let scaleY = windowSize.height / canvas.height;
+    let scaleX = windowSize.width / video.width;
+    let scaleY = windowSize.height / video.height;
 
     let scaleToFit = Math.min(scaleX, scaleY);
     let scaleToCover = Math.max(scaleX, scaleY);
 
     canvas.style.transformOrigin = "0 0"; //scale from top left
-    canvas.style.transform = " translateX("+ (windowSize.width / 2 + canvas.width * scaleToCover / 2) +"px) scale( -" + scaleToCover + ", " + scaleToCover + ")";
+    canvas.style.transform = " translateX("+ (windowSize.width / 2 + canvas.width * scaleToFit / 2) +"px) scale( -" + scaleToFit + ", " + scaleToFit + ")";
     canvas.style.position = "fixed";
-    canvas.style.top = (windowSize.height / 2 - (canvas.height / 2) * scaleToCover) + "px";
+    canvas.style.top = (windowSize.height / 2 - (canvas.height / 2) * scaleToFit) + "px";
     canvas.style.left = 0;
 
     video.style.transformOrigin = "0 0"; //scale from top left
-    video.style.transform = " translateX("+ (windowSize.width / 2 + canvas.width * scaleToCover / 2) +"px) scale( -" + scaleToCover + ", " + scaleToCover + ")";
+    video.style.transform = " translateX("+ (windowSize.width / 2 + canvas.width * scaleToFit / 2) +"px) scale( -" + scaleToFit + ", " + scaleToFit + ")";
     video.style.position = "fixed";
-    video.style.top = (windowSize.height / 2 - (canvas.height / 2) * scaleToCover) + "px";
+    video.style.top = (windowSize.height / 2 - (canvas.height / 2) * scaleToFit) + "px";
     video.style.left = 0;
 
 
@@ -147,7 +147,7 @@ function startFaceDetection(){
 
     faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
 
-    logError(++tick + " : " + (speedFace).toFixed(2) + " / " + (speedDraw).toFixed(2) + " / " + (speedEffect).toFixed(2) + " ----- " + scaleX + " / " + scaleY + " / " + scaleToFit);
+    logError(++tick + " : " + (speedFace).toFixed(2) + " / " + (speedDraw).toFixed(2) + " / " + (speedEffect).toFixed(2) + " ----- " + scaleX + " / " + scaleY);
 
     loopFilter();
   }
