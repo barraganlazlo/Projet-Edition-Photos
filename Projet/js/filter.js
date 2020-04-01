@@ -27,6 +27,13 @@ function startVideo(){
       }
     }
   ).then((stream) => {
+    let deviceId = stream.getVideoTracks()[0].getSettings().deviceId;
+    let frameRate = stream.getVideoTracks()[0].getSettings().frameRate;
+    let height = stream.getVideoTracks()[0].getSettings().height;
+    let width = stream.getVideoTracks()[0].getSettings().width;
+
+    video.height = height;
+    video.width = width;
     video.srcObject = stream;
   }).catch(logError);
 }
@@ -54,8 +61,7 @@ function startFaceDetection(){
   const ctx = canvas.getContext("2d");
   ctxOut = ctx;
   document.body.append(canvas);
-  const rect = canvas.getBoundingClientRect();
-  const displaySize = {width: rect.width, height : rect.height};
+  const displaySize = {width: video.width, height : video.height};
   faceapi.matchDimensions(canvas, displaySize);
   // canvas.style.width = "100%";
 
