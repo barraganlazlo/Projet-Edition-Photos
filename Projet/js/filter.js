@@ -8,7 +8,7 @@ Promise.all([
   faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
   faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
 ])
-.then(startFaceDetection)
+.then(startVideo)
 .catch((e) => {
   console.log(e);
 })
@@ -23,7 +23,9 @@ function startVideo(){
   );
 }
 
-startVideo();
+video.addEventListener('play', () => {
+  startFaceDetection();
+})
 
 
 function startFaceDetection(){
@@ -44,7 +46,7 @@ function startFaceDetection(){
 
     USER_DATAS.ImageIn = video;
     USER_DATAS.interporlationType = "Bilinear";
-    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+    const detections = await faceapi.detectAllFaces(video, new faceapi.SsdMobilenetv1Options()).withFaceLandmarks();
     const resizedDetections = faceapi.resizeResults(detections, displaySize);
 
     ctxOut.drawImage(video, 0, 0); //Draw default image
