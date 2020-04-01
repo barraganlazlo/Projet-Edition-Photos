@@ -209,7 +209,7 @@ const Matrix = {
         }
         for(let i; i < I.length; i++){
           for(let j; j < I.length; j++){
-            I[i][j] = roundFloat(I[i][j]);
+            I[i][j] = (I[i][j]);
           }
         }
         return I;
