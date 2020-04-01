@@ -70,6 +70,24 @@ function startFaceDetection(){
   canvasDraw.width=video.width;
   canvasDraw.height=video.height;
 
+  let scaleX = window.innerWidth / canvas.width;
+  let scaleY = window.innerHeight / canvas.height;
+
+  let scaleToFit = Math.min(scaleX, scaleY);
+  let scaleToCover = Math.max(scaleX, scaleY);
+
+  canvas.style.transformOrigin = "0 0"; //scale from top left
+  canvas.style.transform = "scale(" + scaleToFit + ")";
+  canvas.style.position = "fixed";
+  canvas.style.top = (window.innerHeight / 2 - (canvas.height / 2) * scaleToFit) + "px";
+  canvas.style.left = 0;
+
+  video.style.transformOrigin = "0 0"; //scale from top left
+  video.style.transform = "scale(" + scaleToFit + ")";
+  video.style.position = "fixed";
+  video.style.top = (window.innerHeight / 2 - (canvas.height / 2) * scaleToFit) + "px";
+  video.style.left = 0;
+
   let echec = 0;
 
   let loopFilter = async () => {
@@ -81,9 +99,7 @@ function startFaceDetection(){
     const resizedDetections = faceapi.resizeResults(detections, displaySize);
 
     ctxDraw.drawImage(video, 0, 0); //Draw default image temporaly
-    ctxOut.clearRect(0, 0, ctxOut.width, ctxOut.height);
-
-    console.log(detections);
+    ctxOut.clearRect(0, 0, video.width, video.height);
 
     if(echec > 20){
       keyPoints = [];
