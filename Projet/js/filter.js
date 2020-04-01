@@ -69,10 +69,10 @@ function startFaceDetection(){
   // canvas.style.width = "100%";
 
   // logError(video.width + " : " + video.height + " / " + canvas.width + " : " + canvas.height);
-  // video.style.width = video.width + "px";
-  // video.style.height = video.height + "px";
-  // canvas.style.width = video.width + "px";
-  // canvas.style.height = video.height + "px";
+  video.style.width = video.width + "px";
+  video.style.height = video.height + "px";
+  canvas.style.width = video.width + "px";
+  canvas.style.height = video.height + "px";
 
 
   let canvasDraw=document.createElement("canvas");
