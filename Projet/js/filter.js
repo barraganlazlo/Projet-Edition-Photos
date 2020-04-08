@@ -120,8 +120,8 @@ function startFaceDetection(){
 
     /* Start performances */ startPerformance();
     ctxDraw.drawImage(video, 0, 0); //Draw default image temporaly
-    // ctxOut.clearRect(0, 0, video.width, video.height);
-    ctxOut.drawImage(video, 0, 0);
+    ctxOut.clearRect(0, 0, video.width, video.height);
+    // ctxOut.drawImage(video, 0, 0);
     /* End  performances */ let speedDraw = endPerformance();
 
     /* Start performances */ startPerformance();
