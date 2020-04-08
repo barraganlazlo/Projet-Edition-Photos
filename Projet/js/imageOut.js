@@ -270,29 +270,33 @@ function Bilinear(ctx, imgData, polygon, invertMatrix, polygoneSquare) {
   let h_out = ctx.canvas.height;
   let newImgData = ctx.createImageData(w_out, h_out);
 
+  //Déclaration de toutes les variables pour l'optimisation
+  const Neighbor = []; //Optimisation parce qu'on connait à l'avance la taille des voisins
+  const curves = [];
+  let newPos, floatingPos, inside;
+  let pos = new Point();
+  let p1 = new Point();
+  let p2 = new Point();
   for (let y = 0; y < h_out; y++) {
     for (let x = 0; x < w_out; x++) {
       //position du pixel courrant dans newImgData
-      let newPos = x * 4 + y * w_out * 4;
+      newPos = x * 4 + y * w_out * 4;
       //position exacte du point après transformation inverse
-      let floatingPos = linearTransformationPoint(Point(x, y), invertMatrix);
+      floatingPos = linearTransformationPoint(Point(x, y), invertMatrix);
 
-      let inside=false;
+      inside=false;
       if(USER_DATAS.global){
         if(insideSquare(floatingPos,w,h)) inside=true;
       }else{
         if(insidePolygonSquare(floatingPos, polygoneSquare.minPos, polygoneSquare.maxPos) && insidePolygon(Point(x, y), polygon)) inside =true;
       }
 
-
-
       if(inside){
         // 1. On calcule les 4 voisins
-        let pos = new Point(Math.floor(floatingPos.x), Math.floor(floatingPos.y));
-        const Neighbor = [];
+        pos.x = Math.floor(floatingPos.x);
+        pos.y = Math.floor(floatingPos.y);
 
         for(let i = 0; i < 2; i++ ){
-          Neighbor[i] = [];
           for(let j = 0; j < 2; j++ ){
             const p = new Point(pos.x + i,pos.y + j);
             //On merge les valeurs en dehors de la taille de l'image
@@ -300,17 +304,16 @@ function Bilinear(ctx, imgData, polygon, invertMatrix, polygoneSquare) {
             if(p.y <0){ p.y = 0; }
             if(p.x>=w){ p.x=w-1; }
             if(p.y>=h){ p.y=h-1; }
-            Neighbor[i][j]=p;
+            Neighbor[i * 2 + j]=p;
           }
         }
         // Pour chaques valeurs de RGBA
         for (let k = 0; k < 4; k++) {
 
           // 2. On calcule les 4 courbes cubiques
-          let curves = [];
           for(let i=0;i<2;i++){
-            let p1= new Point(pos.y + 0, imgData.data[4*Neighbor[i][0].x + 4*Neighbor[i][0].y *w +k]);
-            let p2= new Point(pos.y + 1, imgData.data[4*Neighbor[i][1].x + 4*Neighbor[i][1].y *w +k]);
+            p1= new Point(pos.y + 0, imgData.data[4*Neighbor[i * 2 + 0].x + 4*Neighbor[i * 2 + 0].y *w +k]);
+            p2= new Point(pos.y + 1, imgData.data[4*Neighbor[i * 2 + 1].x + 4*Neighbor[i * 2 + 1].y *w +k]);
             curves[i]=linear(p1,p2);
           }
           // 3. On calcule la nouvelle courbe cubique associé aux 4 points des courbes précédentes données par la valeur du floatingPos en y

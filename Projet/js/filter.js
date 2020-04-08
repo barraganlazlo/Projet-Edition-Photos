@@ -6,7 +6,7 @@
  */
 const MODEL_URL = 'https://barraganlazlo.github.io/Projet-Edition-Photos/Projet/models';
 let STOP_FILTER = false;
-let MOBILE_PERF = false;
+let MOBILE_PERF = true;
 
 Promise.all([
   faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
@@ -120,8 +120,8 @@ function startFaceDetection(){
 
     /* Start performances */ startPerformance();
     ctxDraw.drawImage(video, 0, 0); //Draw default image temporaly
-    //ctxOut.clearRect(0, 0, video.width, video.height);
-    ctxOut.drawImage(video, 0, 0);
+    ctxOut.clearRect(0, 0, video.width, video.height);
+    // ctxOut.drawImage(video, 0, 0);
     /* End  performances */ let speedDraw = endPerformance();
 
     /* Start performances */ startPerformance();
