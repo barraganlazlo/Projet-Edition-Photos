@@ -34,8 +34,8 @@ function startVideo(){
   logDOM(navigator.mediaDevices);
   navigator.mediaDevices.getUserMedia({
       video: {
-        width: {ideal: 480, max: 480},
-        height: {ideal: 320, max: 320},
+        width: {ideal: 240, max: 240},
+        height: {ideal: 160, max: 160},
         facingMode: "user",
       }
     }
