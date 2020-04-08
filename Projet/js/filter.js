@@ -45,8 +45,8 @@ function startVideo(){
     let height = stream.getVideoTracks()[0].getSettings().height;
     let width = stream.getVideoTracks()[0].getSettings().width;
 
-    video.height = height;
-    video.width = width;
+    video.height = width;
+    video.width = height;
     video.srcObject = stream;
   }).catch(logDOM);
 }
