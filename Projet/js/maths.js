@@ -127,15 +127,15 @@ const Matrix = {
         return Matrix3(_a, _b, _c, _d, _e, _f, _g, _h, _i);
     },
     mult(a, b, ...other) {
-        let _a = (a[0][0] * b[0][0] + a[0][1] * b[1][0] + a[0][2] * b[2][0]);
-        let _b = (a[0][0] * b[0][1] + a[0][1] * b[1][1] + a[0][2] * b[2][1]);
-        let _c = (a[0][0] * b[0][2] + a[0][1] * b[1][2] + a[0][2] * b[2][2]);
-        let _d = (a[1][0] * b[0][0] + a[1][1] * b[1][0] + a[1][2] * b[2][0]);
-        let _e = (a[1][0] * b[0][1] + a[1][1] * b[1][1] + a[1][2] * b[2][1]);
-        let _f = (a[1][0] * b[0][2] + a[1][1] * b[1][2] + a[1][2] * b[2][2]);
-        let _g = (a[2][0] * b[0][0] + a[2][1] * b[1][0] + a[2][2] * b[2][0]);
-        let _h = (a[2][0] * b[0][1] + a[2][1] * b[1][1] + a[2][2] * b[2][1]);
-        let _i = (a[2][0] * b[0][2] + a[2][1] * b[1][2] + a[2][2] * b[2][2]);
+        let _a = parseFloat((a[0][0] * b[0][0] + a[0][1] * b[1][0] + a[0][2] * b[2][0]).toFixed(5));
+        let _b = parseFloat((a[0][0] * b[0][1] + a[0][1] * b[1][1] + a[0][2] * b[2][1]).toFixed(5));
+        let _c = parseFloat((a[0][0] * b[0][2] + a[0][1] * b[1][2] + a[0][2] * b[2][2]).toFixed(5));
+        let _d = parseFloat((a[1][0] * b[0][0] + a[1][1] * b[1][0] + a[1][2] * b[2][0]).toFixed(5));
+        let _e = parseFloat((a[1][0] * b[0][1] + a[1][1] * b[1][1] + a[1][2] * b[2][1]).toFixed(5));
+        let _f = parseFloat((a[1][0] * b[0][2] + a[1][1] * b[1][2] + a[1][2] * b[2][2]).toFixed(5));
+        let _g = parseFloat((a[2][0] * b[0][0] + a[2][1] * b[1][0] + a[2][2] * b[2][0]).toFixed(5));
+        let _h = parseFloat((a[2][0] * b[0][1] + a[2][1] * b[1][1] + a[2][2] * b[2][1]).toFixed(5));
+        let _i = parseFloat((a[2][0] * b[0][2] + a[2][1] * b[1][2] + a[2][2] * b[2][2]).toFixed(5));
         let matrix3 = Matrix3(_a, _b, _c, _d, _e, _f, _g, _h, _i);
         if (other.length == 0) return matrix3;
         return Matrix.mult(matrix3, ...other);

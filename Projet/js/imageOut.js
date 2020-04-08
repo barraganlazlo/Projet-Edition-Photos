@@ -40,9 +40,11 @@ function DrawOutContext(debug = false) {
       let height_imageIn = ImageInData.height;
       let width_imageIn = ImageInData.width;
 
-      let translatetocenterMatrix = matrixTranslate(new Vector2(- width_imageIn / 2, - height_imageIn / 2));
-      let translatebackMatrix = matrixTranslate(new Vector2(width_imageIn / 2, height_imageIn / 2));
+      let translatetocenterMatrix = matrixTranslate(new Vector2(- width_imageIn / 2.0, - height_imageIn / 2.0));
+      let translatebackMatrix = matrixTranslate(new Vector2(width_imageIn / 2.0, height_imageIn / 2.0));
       finalMatrix = Matrix.mult(translatebackMatrix, rotateMatrix, scaleMatrix, translatetocenterMatrix);
+
+      console.log(translatetocenterMatrix, translatebackMatrix, finalMatrix);
 
       //calculate height and width of the image after transformation
       let x0 = linearTransformationPoint(new Point(0,0), finalMatrix);
@@ -54,6 +56,7 @@ function DrawOutContext(debug = false) {
       minMax.addValue(x1);
       minMax.addValue(x2);
       minMax.addValue(x3);
+      console.log(x0, x1, x2, x3);
 
       let translateCorrection = matrixTranslate(new Vector2(- minMax.minPos.x, - minMax.minPos.y));
       finalMatrix = Matrix.mult(translateCorrection, finalMatrix);
@@ -65,7 +68,8 @@ function DrawOutContext(debug = false) {
 
       h = 1 + minMax.maxPos.y - minMax.minPos.y;
       w = 1 + minMax.maxPos.x - minMax.minPos.x;
-
+      console.log(w,h);
+      console.log(width_imageIn,height_imageIn);
       //Set extremum points and center of the polygon
       outKeyPoints = [x0,x1,x2,x3];
       newCenter = linearTransformationPoint(center, finalMatrix);
