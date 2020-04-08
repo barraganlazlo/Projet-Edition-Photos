@@ -34,8 +34,8 @@ function startVideo(){
   logDOM(navigator.mediaDevices);
   navigator.mediaDevices.getUserMedia({
       video: {
-        width: {ideal: 240, max: 240},
-        height: {ideal: 160, max: 160},
+        width: {ideal: 480, max: 480},
+        height: {ideal: 320, max: 320},
         facingMode: "user",
       }
     }
@@ -113,7 +113,7 @@ function startFaceDetection(){
 
     /* Start performances */ startPerformance();
     let detections
-    if(MOBILE_PERF) detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({inputSize : 256, scoreThreshold: 0.5})).withFaceLandmarks(true);
+    if(MOBILE_PERF) detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({inputSize : 128, scoreThreshold: 0.5})).withFaceLandmarks(true);
     else detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
 
     /* End  performances */ let speedFace = endPerformance();
