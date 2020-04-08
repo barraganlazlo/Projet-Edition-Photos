@@ -44,35 +44,25 @@ function DrawOutContext(debug = false) {
       let translatebackMatrix = matrixTranslate(new Vector2(width_imageIn / 2.0, height_imageIn / 2.0));
       finalMatrix = Matrix.mult(translatebackMatrix, rotateMatrix, scaleMatrix, translatetocenterMatrix);
 
-      console.log(translatetocenterMatrix, translatebackMatrix, finalMatrix);
+      // console.log(translatetocenterMatrix, translatebackMatrix, finalMatrix);
 
       //calculate height and width of the image after transformation
-      let x0 = linearTransformationPoint(new Point(0,0), finalMatrix);
-      let x1 = linearTransformationPoint(new Point(width_imageIn-1, 0), finalMatrix);
-      let x2 = linearTransformationPoint(new Point(width_imageIn-1, height_imageIn-1), finalMatrix);
-      let x3 = linearTransformationPoint(new Point(0, height_imageIn-1), finalMatrix);
+      let x0 = linearTransformationPoint(new Point(-0.5,-0.5), finalMatrix);
+      let x1 = linearTransformationPoint(new Point(width_imageIn-0.5, -0.5), finalMatrix);
+      let x2 = linearTransformationPoint(new Point(width_imageIn-0.5, height_imageIn-0.5), finalMatrix);
+      let x3 = linearTransformationPoint(new Point(-0.5, height_imageIn-0.5), finalMatrix);
       let minMax = new MinMaxVector2();
       minMax.addValue(x0);
       minMax.addValue(x1);
       minMax.addValue(x2);
       minMax.addValue(x3);
-      console.log(x0, x1, x2, x3);
+      // console.log(x0, x1, x2, x3);
 
       let translateCorrection = matrixTranslate(new Vector2(- minMax.minPos.x, - minMax.minPos.y));
       finalMatrix = Matrix.mult(translateCorrection, finalMatrix);
       invertMatrix = Matrix.invert(finalMatrix);
-      x0 = linearTransformationPoint(new Point(0,0), finalMatrix);
-      x1 = linearTransformationPoint(new Point(width_imageIn, 0), finalMatrix);
-      x2 = linearTransformationPoint(new Point(width_imageIn, height_imageIn), finalMatrix);
-      x3 = linearTransformationPoint(new Point(0, height_imageIn), finalMatrix);
-
-      h = 1 + minMax.maxPos.y - minMax.minPos.y;
-      w = 1 + minMax.maxPos.x - minMax.minPos.x;
-      console.log(w,h);
-      console.log(width_imageIn,height_imageIn);
-      //Set extremum points and center of the polygon
-      outKeyPoints = [x0,x1,x2,x3];
-      newCenter = linearTransformationPoint(center, finalMatrix);
+      h = minMax.maxPos.y - minMax.minPos.y;
+      w = minMax.maxPos.x - minMax.minPos.x;
     }else{
       w = ImageInData.width;
       h = ImageInData.height;
@@ -297,30 +287,36 @@ function Bilinear(ctx, imgData, polygon, invertMatrix, polygoneSquare) {
 
 
       if(inside){
-        floatingPos.x+=0.0001;
-        floatingPos.y+=0.0001;
-        //position arrondi "au plus proche" après transformation inverse
-        let i = Math.floor(floatingPos.x);
-        let j = Math.floor(floatingPos.y);
-        let t = floatingPos.x - i; //Horizontal Distance with i
-        let u = floatingPos.y - j; //Vertical Distance with j
-        // if( x == 0 && y == 0)console.log("floatingPos 0,0 : ",floatingPos);
-        // if( x == 0 && y == 0)console.log("i,j 0,0 : ",i,j);
-        //Loop for RGBA
-        let va=0,vb=0;
+        // 1. On calcule les 4 voisins
+        let pos = new Point(Math.floor(floatingPos.x), Math.floor(floatingPos.y));
+        const Neighbor = [];
+
+        for(let i = 0; i < 2; i++ ){
+          Neighbor[i] = [];
+          for(let j = 0; j < 2; j++ ){
+            const p = new Point(pos.x + i,pos.y + j);
+            //On merge les valeurs en dehors de la taille de l'image
+            if(p.x <0){ p.x = 0; }
+            if(p.y <0){ p.y = 0; }
+            if(p.x>=w){ p.x=w-1; }
+            if(p.y>=h){ p.y=h-1; }
+            Neighbor[i][j]=p;
+          }
+        }
+        // Pour chaques valeurs de RGBA
         for (let k = 0; k < 4; k++) {
-          va=(1 - u) * imgData.data[(j*w + i)*4 + k];
-          vb=va;
-          if(j<h-1){
-            va=(va + u * imgData.data[((j+1)*w + i)*4 + k]);
+
+          // 2. On calcule les 4 courbes cubiques
+          let curves = [];
+          for(let i=0;i<2;i++){
+            let p1= new Point(pos.y + 0, imgData.data[4*Neighbor[i][0].x + 4*Neighbor[i][0].y *w +k]);
+            let p2= new Point(pos.y + 1, imgData.data[4*Neighbor[i][1].x + 4*Neighbor[i][1].y *w +k]);
+            curves[i]=linear(p1,p2);
           }
-          if(i<w-1){
-            vb=(1 - u) * imgData.data[(j*w + i+1)*4 + k];
-          }
-          if(j<h-1 && i<w-1){
-            vb=(vb + u * imgData.data[((j+1)*w + i+1)*4 + k ]);
-          }
-          newImgData.data[newPos + k] = ( (1-t) * va +  t *vb);
+          // 3. On calcule la nouvelle courbe cubique associé aux 4 points des courbes précédentes données par la valeur du floatingPos en y
+          let final_curve= linear( new Point(pos.x + 0, curves[0](floatingPos.y)),new Point(pos.x + 1, curves[1](floatingPos.y)) );
+          // 4. On obtient la valeur voulue en appliquant la valeur du floatingPos en x à la dernière courbe cubique
+          newImgData.data[newPos + k] = final_curve(floatingPos.x);
         }
       }else{
         //Default value
@@ -413,6 +409,13 @@ function Bicubic(ctx, imgData, polygon, invertMatrix, polygoneSquare) {
   return newImgData;
 }
 
+function linear(p1, p2){
+  const m = (p2.y - p1.y) / (p2.x - p1.x);
+  return (x) => {
+    return m * (x - p1.x) + p1.y;
+  }
+}
+
 /**
  * Permet de calculer une fonction cubique grâce à 4 points
  * @param {Point} p1 le point numéro 1
@@ -500,7 +503,7 @@ function insidePolygonSquare(point,p0,p1){
 function insideSquare(point,w,h){
   let inside=true;
   let margin=0.001;
-  if(point.x <0 -margin || point.x>=w+margin || point.y <0-margin || point.y>=h+margin ){
+  if(point.x < -0.5 -margin || point.x>=w-0.5+margin || point.y <-0.5-margin || point.y>=h-0.5+margin ){
     inside=false;
   }
   return inside;
