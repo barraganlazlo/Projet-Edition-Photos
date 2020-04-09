@@ -188,12 +188,56 @@ function drawCubicStep(x, y, step = 0){
 function Draw(){
   let x = mouse.x / sizePixel - centerLeft() / sizePixel;
   let y = mouse.y / sizePixel - centerTop() / sizePixel;
-  drawAllPixels();
-  drawCircle(mouse.x, mouse.y);
-  // drawNeighbourBilinear(x, y);
-  // drawLinearStep(x, y, 2);
-  drawNeighbourBicubic(mouse.x / sizePixel - centerLeft() / sizePixel, mouse.y / sizePixel - centerTop() / sizePixel);
-  drawCubicStep(x, y, 2);
+  if(MAIN_STEP == 0){
+    drawAllPixels(true);
+  }else if(MAIN_STEP == 1){
+    drawAllPixels();
+  }else if(MAIN_STEP == 2){
+    drawAllPixels();
+    drawCircle(mouse.x, mouse.y);
+  }else if(MAIN_STEP == 3){
+    drawAllPixels();
+    drawCircle(mouse.x, mouse.y);
+    drawNeighbourBilinear(x, y);
+  }else if(MAIN_STEP == 4){
+    drawAllPixels();
+    drawCircle(mouse.x, mouse.y);
+    drawLinearStep(x, y, 0);
+  }else if(MAIN_STEP == 5){
+    drawAllPixels();
+    drawCircle(mouse.x, mouse.y);
+    drawLinearStep(x, y, 1);
+  }else if(MAIN_STEP == 6){
+    drawAllPixels();
+    drawCircle(mouse.x, mouse.y);
+    drawLinearStep(x, y, 2);
+  }else if(MAIN_STEP == 7){
+    drawAllPixels();
+    drawCircle(mouse.x, mouse.y);
+    drawNeighbourBilinear(x, y);
+    drawLinearStep(x, y, 2);
+  }else if(MAIN_STEP == 8){
+    drawAllPixels();
+    drawCircle(mouse.x, mouse.y);
+    drawNeighbourBicubic(x, y);
+  }else if(MAIN_STEP == 9){
+    drawAllPixels();
+    drawCircle(mouse.x, mouse.y);
+    drawCubicStep(x, y, 0);
+  }else if(MAIN_STEP == 10){
+    drawAllPixels();
+    drawCircle(mouse.x, mouse.y);
+    drawCubicStep(x, y, 1);
+  }else if(MAIN_STEP == 11){
+    drawAllPixels();
+    drawCircle(mouse.x, mouse.y);
+    drawCubicStep(x, y, 2);
+  }else if(MAIN_STEP == 12){
+    drawAllPixels();
+    drawCircle(mouse.x, mouse.y);
+    drawNeighbourBicubic(x, y);
+    drawCubicStep(x, y, 2);
+  }
 }
 
 // The proper game loop
@@ -204,3 +248,11 @@ function gameLoop() {
     Draw();
     window.requestAnimationFrame(gameLoop);
 }
+
+let MAIN_STEP = 0;
+window.addEventListener("keydown", (e) => {
+  if(e.code == "ArrowRight") MAIN_STEP++;
+  if(e.code == "ArrowLeft") MAIN_STEP--;
+  if(MAIN_STEP < 0) MAIN_STEP = 0;
+  if(MAIN_STEP > 12) MAIN_STEP = 12;
+});
