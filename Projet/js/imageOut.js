@@ -232,6 +232,10 @@ function NearestNeighbor(ctx, imgData, polygon, invertMatrix, polygoneSquare) {
 
         //position arrondi après transformation inverse
         let roundedPos = new Point( Math.round(floatingPos.x), Math.round(floatingPos.y)) ;
+        if(roundedPos.x <0){ roundedPos.x = 0; }
+        if(roundedPos.y <0){ roundedPos.y = 0; }
+        if(roundedPos.x>=w){ roundedPos.x=w-1; }
+        if(roundedPos.y>=h){ roundedPos.y=h-1; }
         // if(x == 0 && y ==  0 ) console.log("roundedPos 0,0 : ",roundedPos);
         // if( x == w_out - 1 && y == h_out - 1)console.log("roundedPos w-1,h-1 : ",roundedPos);
 
