@@ -45,8 +45,8 @@ function startVideo(){
     let height = stream.getVideoTracks()[0].getSettings().height;
     let width = stream.getVideoTracks()[0].getSettings().width;
 
-    video.height = width;
-    video.width = height;
+    video.height = height;
+    video.width = width;
     video.srcObject = stream;
   }).catch(logDOM);
 }
@@ -70,6 +70,7 @@ function logDOM(err){
 let perf = 0;
 function startPerformance(){ perf = performance.now(); };
 function endPerformance(){ return performance.now() - perf; };
+let canvas;
 
 /**
  * Lancement de la detection du visage + filtre
@@ -78,7 +79,7 @@ function startFaceDetection(){
   if(video.paused) return setTimeout(startFaceDetection); //Loop si la vidéo ne s'est pas lancée
 
   //Création du canvas pour afficher le filtre
-  const canvas = faceapi.createCanvasFromMedia(video);
+  canvas = faceapi.createCanvasFromMedia(video);
   canvas.id = "canvasOut";
   canvas.className = "-align-scenter";
   const ctxOut = canvas.getContext("2d");
@@ -120,8 +121,8 @@ function startFaceDetection(){
 
     /* Start performances */ startPerformance();
     ctxDraw.drawImage(video, 0, 0); //Draw default image temporaly
-    ctxOut.clearRect(0, 0, video.width, video.height);
-    // ctxOut.drawImage(video, 0, 0);
+    // ctxOut.clearRect(0, 0, video.width, video.height);
+    ctxOut.drawImage(video, 0, 0);
     /* End  performances */ let speedDraw = endPerformance();
 
     /* Start performances */ startPerformance();
@@ -169,7 +170,7 @@ function startFaceDetection(){
 
 function calculateMouthPolygon(landmarks){
   const dist = distance(new Point(landmarks.positions[66]._x, landmarks.positions[66]._y), new Point(landmarks.positions[62]._x, landmarks.positions[62]._y)) / 20;
-  let scale = 1.2 + (dist * dist);
+  let scale = 1 + (dist * dist);
   if(MOBILE_PERF) scale = scale > 3 ? 3 : scale;
   USER_DATAS.scale = scale;
   keyPoints = [];
@@ -209,4 +210,11 @@ function initRendering(canvas){
 
 
   USER_DATAS.ImageIn = video;
+}
+
+function snapMe(){
+  let link = document.createElement('a');
+  link.download = 'bigMouth.png';
+  link.href = canvas.toDataURL();
+  link.click();
 }

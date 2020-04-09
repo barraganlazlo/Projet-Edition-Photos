@@ -10,10 +10,15 @@
   <body class="-flexCStart -align-ifill back-dark">
     <div class="-layer -flexCStart -align-ifill" style="z-index: 1;">
       <div class="centPSALL  -flexCBetween">
-        <div id="ERROR" class="back-danger -padALL font-large -align-sstart"></div>
+        <a href="index.html" class="btn -no-after -flexCStart -roundest back-4 -shadow -margALL">
+          <div class="-flexRStart">
+            <p class="-margL color-dark">Retour</p>
+          </div>
+        </a>
+        <div id="ERROR" style="display:none;"></div>
         <div class=""></div>
 
-        <div class="-flexCStart margin-long">
+        <div class="-flexCStart margin-long pointer" onclick="snapMe()">
           <div class="-flexCStart -align-ifill -bordered bord-clear -bordsize-average -padALL -roundest -shadow-lg">
             <div class="-roundest -flexCStart flex1 back-clear padding-very-long -shadow-lg"></div>
           </div>
@@ -21,7 +26,7 @@
 
       </div>
     </div>
-    <video id="video" height="320" width="240" style="-webkit-user-select: none;background:red;" class="-align-scenter" autoplay crossorigin="anonymous"></video>
+    <video id="video" height="240" width="320" style="-webkit-user-select: none;" class="-align-scenter" autoplay crossorigin="anonymous"></video>
   </body>
   <script src="js/face-api.min.js" charset="utf-8"></script>
   <script src="js/filter.js" charset="utf-8"></script>
