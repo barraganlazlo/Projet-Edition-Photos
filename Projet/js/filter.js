@@ -8,6 +8,9 @@ const MODEL_URL = 'https://barraganlazlo.github.io/Projet-Edition-Photos/Projet/
 let STOP_FILTER = false;
 let MOBILE_PERF = true;
 
+let windowSize = document.body.getBoundingClientRect();
+MOBILE_PERF = windowSize.width < 800;
+
 Promise.all([
   faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
   faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL),
@@ -34,8 +37,8 @@ function startVideo(){
   logDOM(navigator.mediaDevices);
   navigator.mediaDevices.getUserMedia({
       video: {
-        width: {ideal: 480, max: 480},
-        height: {ideal: 320, max: 320},
+        width: {ideal: MOBILE_PERF ? 480 : 9600, max: MOBILE_PERF ? 480 : 9600},
+        height: {ideal: MOBILE_PERF ? 320 : 6400, max: MOBILE_PERF ? 320 : 6400},
         facingMode: "user",
       }
     }
@@ -45,7 +48,6 @@ function startVideo(){
     let height = stream.getVideoTracks()[0].getSettings().height;
     let width = stream.getVideoTracks()[0].getSettings().width;
 
-    const windowSize = document.body.getBoundingClientRect();
     if(windowSize.width < 800){
       video.height = width;
       video.width = height;
