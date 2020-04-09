@@ -153,9 +153,13 @@ function getDataOut(ctx) {
     outKeyPoints[i] = linearTransformationPoint(keyPoints[i], finalMatrix);
     polygoneSquare.addValue(keyPoints[i]);
   }
+
+  let polygoneSquareTransform = new MinMaxVector2();
+  polygoneSquareTransform.minPos = linearTransformationPoint(polygoneSquare.minPos, finalMatrix);
+  polygoneSquareTransform.maxPos = linearTransformationPoint(polygoneSquare.maxPos, finalMatrix);
   // console.log("invertMatrix", invertMatrix);
   //setContextSize(ctx, w, h);*
-  let ImageOutData = Bilinear(ctx, ImageInData, outKeyPoints, invertMatrix, polygoneSquare);
+  let ImageOutData = BilinearOpti(ctx, ImageInData, outKeyPoints, invertMatrix, polygoneSquare, polygoneSquareTransform);
 
   return ImageOutData;
 }
@@ -296,6 +300,79 @@ function Bilinear(ctx, imgData, polygon, invertMatrix, polygoneSquare) {
       }
 
       if(inside){
+        // 1. On calcule les 4 voisins
+        pos.x = Math.floor(floatingPos.x);
+        pos.y = Math.floor(floatingPos.y);
+
+        for(let i = 0; i < 2; i++ ){
+          for(let j = 0; j < 2; j++ ){
+            const p = new Point(pos.x + i,pos.y + j);
+            //On merge les valeurs en dehors de la taille de l'image
+            if(p.x <0){ p.x = 0; }
+            if(p.y <0){ p.y = 0; }
+            if(p.x>=w){ p.x=w-1; }
+            if(p.y>=h){ p.y=h-1; }
+            Neighbor[i * 2 + j]=p;
+          }
+        }
+        // Pour chaques valeurs de RGBA
+        for (let k = 0; k < 4; k++) {
+
+          // 2. On calcule les 4 courbes cubiques
+          for(let i=0;i<2;i++){
+            p1= new Point(pos.y + 0, imgData.data[4*Neighbor[i * 2 + 0].x + 4*Neighbor[i * 2 + 0].y *w +k]);
+            p2= new Point(pos.y + 1, imgData.data[4*Neighbor[i * 2 + 1].x + 4*Neighbor[i * 2 + 1].y *w +k]);
+            curves[i]=linear(p1,p2);
+          }
+          // 3. On calcule la nouvelle courbe cubique associé aux 4 points des courbes précédentes données par la valeur du floatingPos en y
+          let final_curve= linear( new Point(pos.x + 0, curves[0](floatingPos.y)),new Point(pos.x + 1, curves[1](floatingPos.y)) );
+          // 4. On obtient la valeur voulue en appliquant la valeur du floatingPos en x à la dernière courbe cubique
+          newImgData.data[newPos + k] = final_curve(floatingPos.x);
+        }
+      }else{
+        //Default value
+        for (let i = 0; i < 4; i++) {
+          newImgData.data[newPos + i] = 0;
+        }
+      }
+    }
+  }
+
+  return newImgData;
+}
+
+/**
+*
+* @param {Context} ctx le context dans lequel on crée la nouvelle image
+* @param {ImageData} imgData l'image data de l'image d'origine
+* @param {Polygon} polygon le polygone transformé
+* @param {Matrix} invertMatrix la matrice inverce de la transformation qu'à reçu le polygone
+*
+* @returns {ImageData} la nouvelle image data
+*/
+function BilinearOpti(ctx, imgData, polygon, invertMatrix, polygoneSquare, polygoneSquareTransform) {
+  let w = imgData.width;
+  let h = imgData.height;
+  let w_out = ctx.canvas.width;
+  let h_out = ctx.canvas.height;
+  let newImgData = ctx.createImageData(w_out, h_out);
+
+  //Déclaration de toutes les variables pour l'optimisation
+  const Neighbor = []; //Optimisation parce qu'on connait à l'avance la taille des voisins
+  const curves = [];
+  let newPos, floatingPos, inside;
+  let pos = new Point();
+  let p1 = new Point();
+  let p2 = new Point();
+  for (let y = Math.round(polygoneSquareTransform.minPos.y); y < polygoneSquareTransform.maxPos.y ; y++) {
+    for (let x = Math.round(polygoneSquareTransform.minPos.x); x < polygoneSquareTransform.maxPos.x; x++) {
+
+      //position du pixel courrant dans newImgData
+      newPos = x * 4 + y * w_out * 4;
+      //position exacte du point après transformation inverse
+      floatingPos = linearTransformationPoint(Point(x, y), invertMatrix);
+
+      if(insidePolygon(Point(x, y), polygon)){
         // 1. On calcule les 4 voisins
         pos.x = Math.floor(floatingPos.x);
         pos.y = Math.floor(floatingPos.y);
