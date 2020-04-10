@@ -20,7 +20,7 @@ let outKeyPoints = [];
 * Draw canvas' out context
 * @param {Boolean} debug draw polygon points
 */
-function DrawOutContext(debug = true) {
+function DrawOutContext(debug = false) {
 
 
   //Draw Image
